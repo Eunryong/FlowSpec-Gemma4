@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173d3a">
+<title>여백 상담실 · 1:1 상담 예약</title>
+<link rel="stylesheet" href="/styles.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">Y</span><span>여백 상담실</span></a>
+  <span class="demo-tag"><i></i> 로컬 시연용</span>
+</header>
+<main class="page-shell">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">ONE-TO-ONE · 30 MINUTES</p>
+      <h1>천천히 이야기할<br><span>시간을 예약하세요.</span></h1>
+      <p>상담자와 시간을 고르면 예약이 바로 확정됩니다.<br>상담 내용은 수집하지 않습니다.</p>
+      <div class="hero-facts"><span>30분 단위</span><span>예약번호로 조회</span><span>KST 기준</span></div>
+    </div>
+    <aside class="hero-card">
+      <div class="card-label">WEEKLY DESK <b>●</b></div>
+      <strong>10:00</strong>
+      <p>오늘의 대화가 시작되는 시간</p>
+      <div class="mini-days"><i></i><i></i><i class="selected"></i><i></i><i></i></div>
+      <div class="card-foot"><span>상담 시간</span><b>30 MIN</b></div>
+    </aside>
+    <span class="orbit"></span>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="예약 서비스 메뉴">
+    <button class="tab active" id="tab-booking" role="tab" aria-selected="true" aria-controls="booking" data-target="booking">상담 예약</button>
+    <button class="tab" id="tab-lookup" role="tab" aria-selected="false" aria-controls="lookup" data-target="lookup">예약 조회·취소</button>
+    <button class="tab" id="tab-desk" role="tab" aria-selected="false" aria-controls="desk" data-target="desk">상담 일정 관리</button>
+  </nav>
+
+  <section id="booking" class="panel active" role="tabpanel" aria-labelledby="tab-booking">
+    <div class="section-heading"><div><p class="eyebrow dark">FIND A TIME</p><h2>가능한 시간을 골라주세요</h2></div><p>날짜와 상담자를 바꾸면 예약 가능한 시간이 다시 표시됩니다.</p></div>
+    <div class="booking-layout">
+      <div class="card">
+        <label class="field"><span>상담자</span><select id="counselor"></select></label>
+        <label class="field"><span>날짜 <small>KST</small></span><select id="date" disabled></select></label>
+        <div class="time-heading"><span>예약 가능 시간</span><small>30분 · 한국 표준시</small></div>
+        <div id="slots" class="slots" aria-live="polite"><p class="empty">상담자를 선택하면 가능한 시간을 보여드릴게요.</p></div>
+        <form id="book-form">
+          <label class="field"><span>이름</span><input id="name" required maxlength="80" autocomplete="name" placeholder="예약자 이름"></label>
+          <label class="field"><span>이메일</span><input id="email" type="email" required maxlength="254" autocomplete="email" placeholder="확인에 사용할 이메일"></label>
+          <p class="privacy">상담 내용이나 민감한 정보는 입력하지 마세요. 이 시연은 이름과 이메일만 저장합니다.</p>
+          <button id="book" class="primary" type="submit" disabled>시간을 먼저 선택해 주세요　↗</button>
+        </form>
+        <div id="book-message" class="message" role="status" aria-live="polite" hidden></div>
+      </div>
+      <aside class="guide">
+        <span class="stamp">예약 안내</span><h3>예약은 제출 즉시<br>확정됩니다.</h3>
+        <p>예약번호가 발급됩니다. 예약번호와 이메일로 예약을 조회하거나 취소할 수 있습니다.</p>
+        <hr><dl><div><dt>상담 길이</dt><dd>30분</dd></div><div><dt>시간 기준</dt><dd>한국 표준시</dd></div><div><dt>취소</dt><dd>예약번호로 가능</dd></div></dl>
+        <small>기능 확인용 로컬 프로토타입</small>
+      </aside>
+    </div>
+  </section>
+
+  <section id="lookup" class="panel" role="tabpanel" aria-labelledby="tab-lookup" hidden>
+    <div class="section-heading"><div><p class="eyebrow dark">YOUR APPOINTMENT</p><h2>예약 정보를 확인하세요</h2></div><p>예약번호와 예약 당시 입력한 이메일이 필요합니다.</p></div>
+    <form id="lookup-form" class="lookup-form">
+      <label class="field"><span>예약번호</span><input id="reference" required placeholder="예: 8F21A9C0"></label>
+      <label class="field"><span>이메일</span><input id="lookup-email" type="email" required placeholder="예약할 때 입력한 이메일"></label>
+      <button class="primary" type="submit">예약 조회　↗</button>
+    </form>
+    <div id="lookup-message" class="message" role="status" aria-live="polite" hidden></div>
+    <div id="details" hidden></div>
+  </section>
+
+  <section id="desk" class="panel" role="tabpanel" aria-labelledby="tab-desk" hidden>
+    <div class="section-heading"><div><p class="eyebrow dark">COUNSELOR DESK</p><h2>상담 가능 시간을 관리하세요</h2></div><p>로컬 시연용 일정 관리입니다. 운영자 인증은 구현하지 않았습니다.</p></div>
+    <div class="warning"><b>시연 전용</b><span>이 영역은 인증 없이 예약자 이름과 일정을 볼 수 있습니다. 실제 정보를 넣거나 외부 네트워크에 공개하지 마세요.</span></div>
+    <div class="desk-layout">
+      <form id="slot-form" class="card slot-form">
+        <h3>새 시간 열기</h3>
+        <label class="field"><span>상담자</span><select id="admin-counselor"></select></label>
+        <label class="field"><span>날짜</span><input id="admin-date" type="date" required></label>
+        <label class="field"><span>시작 시간</span><input id="admin-time" type="time" step="1800" value="10:00" required></label>
+        <button class="secondary" type="submit">가능 시간 추가　＋</button>
+        <div id="desk-message" class="message" role="status" aria-live="polite" hidden></div>
+      </form>
+      <div class="card schedule-card"><div class="schedule-head"><div><h3>날짜별 일정</h3><p>예약 시간에는 예약자 이름이 표시됩니다.</p></div><label><span class="sr-only">일정 날짜</span><input id="schedule-date" type="date"></label></div><div id="schedule" class="schedule" aria-live="polite"><p class="empty">일정을 불러오는 중입니다.</p></div></div>
+    </div>
+  </section>
+  <footer class="footer"><span>YEOBACK · 상담 시간을 잇는 작은 예약 데스크</span><span>LOCAL PROTOTYPE · NO EXTERNAL SERVICES</span></footer>
+</main>
+</body>
+</html>

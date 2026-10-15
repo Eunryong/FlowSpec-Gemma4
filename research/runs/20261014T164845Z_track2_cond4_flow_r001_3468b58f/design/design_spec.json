@@ -1,0 +1,110 @@
+{
+  "goals": [
+    "Provide a standalone Python library for managing 1:1 counseling bookings",
+    "Ensure atomic booking operations using SQLite",
+    "Implement a strict booking lifecycle from slot creation to cancellation"
+  ],
+  "actors": [
+    "Counselor: Manages available time slots",
+    "Client: Queries slots and manages their own bookings"
+  ],
+  "user_flows": [
+    "Counselor opens a slot -> Client queries available slots -> Client books a slot -> Client cancels booking"
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": [
+        "slot_id (INTEGER PK)",
+        "counselor_id (TEXT)",
+        "start_time (TEXT ISO8601)",
+        "status (TEXT: AVAILABLE, BOOKED)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "attributes": [
+        "booking_id (TEXT UUID PK)",
+        "slot_id (INTEGER FK)",
+        "client_name (TEXT)",
+        "client_email (TEXT)",
+        "status (TEXT: CONFIRMED, CANCELLED)"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": "AVAILABLE -> BOOKED (on create_booking), BOOKED -> AVAILABLE (on cancel_booking)"
+    },
+    {
+      "entity": "Booking",
+      "transitions": "CONFIRMED -> CANCELLED (on cancel_booking)"
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current status is 'AVAILABLE'",
+    "Only one booking can exist per slot",
+    "Booking lookup and cancellation require the matching client_email for verification",
+    "Cancellations must atomically reopen the associated slot"
+  ],
+  "ui_views": [
+    "API-based service interface (no GUI)"
+  ],
+  "edge_cases": [
+    "Concurrent booking requests for the same slot (handled by SQLite transaction)",
+    "Attempting to cancel an already cancelled booking",
+    "Querying slots for a date with no availability",
+    "Providing an incorrect email during booking lookup"
+  ],
+  "design_decisions": [
+    "Use SQLite for persistence to ensure ACID properties during booking",
+    "Store timestamps as ISO 8601 strings for SQLite compatibility",
+    "Use UUIDs for booking identifiers to prevent predictable ID enumeration"
+  ],
+  "assumptions": [
+    "All times are handled in Asia/Seoul timezone",
+    "The system is a standalone library without an external web framework"
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "contracts": {
+      "ddl": [
+        "CREATE TABLE IF NOT EXISTS slots (slot_id INTEGER PRIMARY KEY AUTOINCREMENT, counselor_id TEXT NOT NULL, start_time TEXT NOT NULL, status TEXT NOT NULL)",
+        "CREATE TABLE IF NOT EXISTS bookings (booking_id TEXT PRIMARY KEY, slot_id INTEGER NOT NULL, client_name TEXT NOT NULL, client_email TEXT NOT NULL, status TEXT NOT NULL, FOREIGN KEY(slot_id) REFERENCES slots(slot_id))"
+      ],
+      "methods": {
+        "add_available_slot(counselor_id: str, start_time: str) -> None": "Inserts a new slot with status 'AVAILABLE'. Raises ValueError on invalid ISO8601 format.",
+        "query_available_slots(counselor_id: str = None, date: str = None) -> List[Dict]": "Returns list of slots where status='AVAILABLE'. Filters by counselor_id and date (YYYY-MM-DD).",
+        "create_booking(counselor_id: str, start_time: str, client_name: str, client_email: str) -> str": "Returns booking_id. Raises ValueError if slot is unavailable or non-existent.",
+        "lookup_booking(booking_id: str, client_email: str) -> Dict": "Returns booking details. Raises ValueError if email mismatch or booking not found.",
+        "cancel_booking(booking_id: str, client_email: str) -> None": "Updates booking to 'CANCELLED' and slot to 'AVAILABLE'. Raises ValueError on email mismatch."
+      }
+    },
+    "execution_flows": {
+      "create_booking": [
+        "Step 1: Validate input types and format.",
+        "Step 2: Query 'slots' table for a row matching counselor_id, start_time, and status='AVAILABLE'. If not found, raise ValueError('Slot unavailable').",
+        "Step 3: Start transaction. Update slot status to 'BOOKED'. Insert into 'bookings' table with status='CONFIRMED' and a new UUID.",
+        "Step 4: Commit transaction.",
+        "Step 5: Return the generated booking_id."
+      ],
+      "cancel_booking": [
+        "Step 1: Query 'bookings' table for booking_id. If not found, raise ValueError('Booking not found').",
+        "Step 2: Verify that the retrieved client_email matches the provided client_email. If mismatch, raise ValueError('Unauthorized').",
+        "Step 3: Start transaction. Update booking status to 'CANCELLED'. Update associated slot status to 'AVAILABLE'.",
+        "Step 4: Commit transaction.",
+        "Step 5: Return success confirmation."
+      ],
+      "lookup_booking": [
+        "Step 1: Query 'bookings' table by booking_id.",
+        "Step 2: If booking exists, verify client_email. If mismatch, raise ValueError('Unauthorized').",
+        "Step 3: Return booking details as a dictionary."
+      ]
+    },
+    "invariants": [
+      "Slot-Booking Consistency: For every booking with status 'CONFIRMED', the associated slot must have status 'BOOKED'.",
+      "Uniqueness: No two bookings can reference the same slot_id with status 'CONFIRMED' simultaneously."
+    ]
+  }
+}

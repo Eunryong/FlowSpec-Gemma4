@@ -1,0 +1,23 @@
+{
+  "run_id": "20261015T053437Z_track2_no_design_r001_6d5dc1da",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "no_design",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "model_calls": 15,
+  "tool_calls": 15,
+  "input_tokens": 90241,
+  "output_tokens": 48153,
+  "total_tokens": 138394,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 15,
+  "ttft_ms": 1222.551,
+  "first_text_ms": null,
+  "generation_ms": 4364657.27,
+  "total_latency_ms": 4546042.545,
+  "generation_tokens_per_second": 11.032,
+  "tool_time_ms": 287.466,
+  "agent_turn_ms": 4546380.307
+}

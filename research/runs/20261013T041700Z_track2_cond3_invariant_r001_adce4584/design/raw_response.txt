@@ -1,0 +1,123 @@
+{
+  "goals": [
+    "Provide a robust 1:1 counseling booking system with SQLite persistence.",
+    "Ensure strict prevention of double-booking through atomic transactions.",
+    "Maintain data integrity via explicit state transitions and business invariants.",
+    "Enable secure booking lookup and cancellation using client email verification."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book an available slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Creation",
+      "steps": [
+        "Counselor provides counselor_id and start_time",
+        "System validates slot uniqueness",
+        "System persists slot as AVAILABLE"
+      ]
+    },
+    {
+      "flow": "Slot Discovery",
+      "steps": [
+        "Client requests available slots (optional filters: counselor_id, date)",
+        "System queries slots where is_booked is false",
+        "System returns list of available slots"
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client provides counselor_id, start_time, name, and email",
+        "System starts transaction",
+        "System verifies slot exists and is currently AVAILABLE",
+        "System marks slot as BOOKED and creates a CONFIRMED booking record",
+        "System commits transaction and returns booking_id"
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and email",
+        "System verifies booking exists and email matches",
+        "System verifies booking is currently CONFIRMED",
+        "System marks booking as CANCELLED and marks associated slot as AVAILABLE",
+        "System commits transaction"
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "name": "Slot",
+      "attributes": {
+        "slot_id": "INTEGER (PK)",
+        "counselor_id": "STRING",
+        "start_time": "STRING (ISO 8601)",
+        "is_booked": "BOOLEAN"
+      }
+    },
+    {
+      "name": "Booking",
+      "attributes": {
+        "booking_id": "STRING (UUID, PK)",
+        "slot_id": "INTEGER (FK)",
+        "client_name": "STRING",
+        "client_email": "STRING",
+        "status": "STRING (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": [
+        {
+          "from": "AVAILABLE",
+          "to": "BOOKED",
+          "trigger": "Create Booking"
+        },
+        {
+          "from": "BOOKED",
+          "to": "AVAILABLE",
+          "trigger": "Cancel Booking"
+        }
+      ]
+    },
+    {
+      "entity": "Booking",
+      "transitions": [
+        {
+          "from": "NONE",
+          "to": "CONFIRMED",
+          "trigger": "Create Booking"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLED",
+          "trigger": "Cancel Booking"
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "BR-1",
+      "description": "Slot Uniqueness: A counselor cannot have more than one slot starting at the exact same time."
+    },
+    {
+      "id": "BR-2",
+      "description": "Double-Booking Prevention: A slot can only be associated with

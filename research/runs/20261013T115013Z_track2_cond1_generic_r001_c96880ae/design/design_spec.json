@@ -1,0 +1,140 @@
+{
+  "goals": [
+    "Provide a robust system for counselors to manage 30-minute time slots.",
+    "Enable clients to discover and book available counseling slots.",
+    "Implement a secure booking lifecycle including confirmation and cancellation.",
+    "Ensure data persistence using a lightweight SQLite database.",
+    "Guarantee system reliability through a comprehensive automated test suite."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "description": "The provider who creates and manages available time slots for counseling."
+    },
+    {
+      "role": "Client",
+      "description": "The user who searches for available slots, makes bookings, and manages their own reservations."
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Creation",
+      "steps": [
+        "Counselor provides counselor_id and start_time.",
+        "System validates the time format.",
+        "System persists the slot as 'Available'."
+      ]
+    },
+    {
+      "flow": "Slot Discovery",
+      "steps": [
+        "Client requests available slots (optionally filtering by counselor or date).",
+        "System queries the database for slots that are not yet booked.",
+        "System returns a list of available slots."
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client provides counselor_id, start_time, name, and email.",
+        "System verifies the slot exists and is currently unbooked.",
+        "System atomically marks the slot as booked and creates a booking record with a unique UUID.",
+        "System returns the booking_id to the client."
+      ]
+    },
+    {
+      "flow": "Booking Verification",
+      "steps": [
+        "Client provides booking_id and email.",
+        "System verifies the email matches the booking record.",
+        "System returns the booking details."
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and email.",
+        "System verifies the email matches the booking record.",
+        "System updates booking status to 'CANCELLED'.",
+        "System marks the associated slot as 'Available' again."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": [
+        "slot_id (Internal PK)",
+        "counselor_id (String)",
+        "start_time (ISO 8601 String)",
+        "is_booked (Boolean)"
+      ],
+      "relationship": "One-to-One with Booking (Optional)"
+    },
+    {
+      "entity": "Booking",
+      "attributes": [
+        "booking_id (UUID)",
+        "slot_id (FK to Slot)",
+        "client_name (String)",
+        "client_email (String)",
+        "status (Enum: CONFIRMED, CANCELLED)"
+      ],
+      "relationship": "References one Slot"
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE: The slot is open for booking.",
+        "BOOKED: The slot is reserved by a client."
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED: The booking is active and valid.",
+        "CANCELLED: The booking is voided and the slot is released."
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is AVAILABLE.",
+    "Booking creation must be atomic to prevent double-booking of the same slot.",
+    "Booking lookup and cancellation require both the booking_id and the matching client_email for verification.",
+    "Cancelling a booking must automatically transition the associated slot back to AVAILABLE.",
+    "All timestamps must be handled in the Asia/Seoul timezone or include the appropriate offset."
+  ],
+  "ui_views": [
+    {
+      "view": "Slot Management API",
+      "description": "Interface for counselors to add slots and for clients to query available slots."
+    },
+    {
+      "view": "Booking API",
+      "description": "Interface for creating, looking up, and cancelling bookings."
+    }
+  ],
+  "edge_cases": [
+    "Concurrent requests attempting to book the same slot simultaneously.",
+    "Attempts to book a slot that does not exist or is already booked.",
+    "Cancellation requests with a booking_id that exists but a mismatched email.",
+    "Attempts to cancel a booking that has already been cancelled.",
+    "Invalid ISO 8601 date strings provided during slot creation."
+  ],
+  "design_decisions": [
+    "Use a Service Layer pattern (CounselingService) to encapsulate all business logic and database interactions.",
+    "Utilize SQLite for persistence to ensure a standalone, zero-config setup.",
+    "Use UUIDs for booking identifiers to prevent predictable ID enumeration.",
+    "Implement a repository-style approach for SQLite queries to keep the service logic clean."
+  ],
+  "assumptions": [
+    "All counseling slots are exactly 30 minutes in duration.",
+    "The system does not need to handle counselor schedules/calendars beyond individual slot entries.",
+    "The client_email is the primary identifier for user authentication in this V1."
+  ],
+  "unresolved_items": [
+    "Whether to implement validation to prevent a single counselor from having overlapping slots."
+  ]
+}

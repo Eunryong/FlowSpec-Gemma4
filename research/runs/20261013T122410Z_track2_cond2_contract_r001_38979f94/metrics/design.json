@@ -1,0 +1,22 @@
+{
+  "run_id": "20261013T122410Z_track2_cond2_contract_r001_38979f94",
+  "task_id": "brief_v1",
+  "condition": "cond2_contract",
+  "stage": "design",
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1308,
+  "output_tokens": 2547,
+  "total_tokens": 3855,
+  "token_usage_complete": true,
+  "ttft_ms": 8989.035,
+  "first_text_ms": 87705.977,
+  "prefill_ms": 8252.535,
+  "generation_ms": 208860.619,
+  "total_latency_ms": 217849.654,
+  "generation_tokens_per_second": 12.195,
+  "tool_time_ms": 0,
+  "agent_turn_ms": 217880.36
+}

@@ -1,0 +1,120 @@
+{
+  "goals": [
+    "Provide a self-contained Python library for managing 1:1 counseling bookings.",
+    "Ensure atomic booking operations to prevent double-booking of slots.",
+    "Implement a persistent storage layer using SQLite with automated schema initialization.",
+    "Guarantee high reliability through a comprehensive test suite covering edge cases and failure modes."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots",
+        "Manage their own schedule"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Provisioning",
+      "steps": [
+        "Counselor provides counselor_id and start_time (ISO 8601).",
+        "System validates time format and stores the slot as 'Available'."
+      ]
+    },
+    {
+      "flow": "Slot Discovery",
+      "steps": [
+        "Client requests available slots (optional filter by counselor_id or date).",
+        "System returns a list of unbooked slots matching criteria."
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client requests a booking for a specific counselor and start_time.",
+        "System verifies slot existence and availability.",
+        "System atomically marks slot as 'Booked' and creates a 'CONFIRMED' booking record.",
+        "System returns a unique booking_id (UUID)."
+      ]
+    },
+    {
+      "flow": "Booking Verification",
+      "steps": [
+        "Client provides booking_id and client_email.",
+        "System verifies the email matches the booking record.",
+        "System returns booking details."
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and client_email.",
+        "System verifies ownership via email.",
+        "System updates booking status to 'CANCELLED'.",
+        "System reverts the associated slot to 'Available'."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Integer (Primary Key)",
+        "counselor_id": "String",
+        "start_time": "String (ISO 8601)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "String (UUID, Primary Key)",
+        "slot_id": "Integer (Foreign Key -> Slot)",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "String (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "Available: Slot is open for booking.",
+        "Booked: Slot is currently assigned to a booking."
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED: Booking is active and slot is reserved.",
+        "CANCELLED: Booking is void and slot is released."
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is 'Available'.",
+    "Booking creation must be atomic: the slot update and booking record insertion must happen in a single transaction.",
+    "Only the client with the matching email address can look up or cancel a specific booking.",
+    "Cancelling a booking must immediately transition the associated slot back to 'Available'.",
+    "Slots are defined as 30-minute increments (implied by brief), but the system treats the start_time as the unique identifier per counselor."
+  ],
+  "ui_views": [
+    {
+      "view": "API Interface (CounselingService)",
+      "methods": [
+        "add_available_slot(counselor_id, start_time)",
+        "query_available_slots(counselor_id=None, date=None)",
+        "create_booking(counselor_id, start_time, client_name, client_email)",
+        "lookup_booking(booking_id, client_email)",
+        "cancel_booking(booking_id, client_email

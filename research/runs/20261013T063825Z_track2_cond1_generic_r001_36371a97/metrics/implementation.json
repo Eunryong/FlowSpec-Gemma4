@@ -1,0 +1,23 @@
+{
+  "run_id": "20261013T063825Z_track2_cond1_generic_r001_36371a97",
+  "task_id": "brief_v1",
+  "condition": "cond1_generic",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "model_calls": 34,
+  "tool_calls": 33,
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "token_usage_complete": false,
+  "model_calls_with_usage": 33,
+  "ttft_ms": 14069.737,
+  "first_text_ms": null,
+  "generation_ms": null,
+  "total_latency_ms": 3188077.752,
+  "generation_tokens_per_second": null,
+  "tool_time_ms": 2596.963,
+  "agent_turn_ms": 3190755.255
+}

@@ -1,0 +1,22 @@
+{
+  "run_id": "20261015T025111Z_track2_cond3_invariant_r001_a09787a5",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond3_invariant",
+  "stage": "design",
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 4135,
+  "output_tokens": 2290,
+  "total_tokens": 6425,
+  "token_usage_complete": true,
+  "ttft_ms": 21246.527,
+  "first_text_ms": 101131.926,
+  "prefill_ms": 20699.084,
+  "generation_ms": 191492.878,
+  "total_latency_ms": 212739.405,
+  "generation_tokens_per_second": 11.959,
+  "tool_time_ms": 0,
+  "agent_turn_ms": 212753.007
+}

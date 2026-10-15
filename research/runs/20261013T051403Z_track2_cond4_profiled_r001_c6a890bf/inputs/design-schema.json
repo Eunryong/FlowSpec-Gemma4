@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design-specification.schema.json",
+  "title": "Design Specification",
+  "description": "Extensible structure for a design-stage artifact. Research-specific content is intentionally unspecified.",
+  "type": "object",
+  "required": [
+    "goals",
+    "actors",
+    "user_flows",
+    "domain_entities",
+    "states",
+    "business_rules",
+    "ui_views",
+    "edge_cases",
+    "design_decisions",
+    "assumptions",
+    "unresolved_items"
+  ],
+  "properties": {
+    "goals": { "type": "array" },
+    "actors": { "type": "array" },
+    "user_flows": { "type": "array" },
+    "domain_entities": { "type": "array" },
+    "states": { "type": "array" },
+    "business_rules": { "type": "array" },
+    "ui_views": { "type": "array" },
+    "edge_cases": { "type": "array" },
+    "design_decisions": { "type": "array" },
+    "assumptions": { "type": "array" },
+    "unresolved_items": { "type": "array" },
+    "extensions": {
+      "type": "object",
+      "description": "Reserved for future study-specific fields, including revision-aware data.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

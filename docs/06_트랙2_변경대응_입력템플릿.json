@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "0.2",
+  "artifactType": "track_input_template",
+  "status": "DRAFT_TEMPLATE_NOT_RUNNABLE",
+  "trackId": "T2",
+  "trackName": "Revision-aware Design",
+  "baseInputFile": "04_공통_초기요구_템플릿.json",
+  "researchQuestionDraft": "설계 시 확정·잠정 결정·가정·변경 지점과 재검토 조건을 기록하면, 숨겨진 후속 요구 변경에 더 잘 대응하면서 과잉설계를 억제할 수 있는가?",
+  "onlyIntendedTreatment": "representation and traceability of design decisions under uncertainty",
+  "revisionLedgerSchema": [
+    {
+      "field": "cardId",
+      "required": true
+    },
+    {
+      "field": "decisionOrRequirement",
+      "required": true
+    },
+    {
+      "field": "maturity",
+      "allowed": [
+        "STABLE",
+        "PROVISIONAL",
+        "ASSUMPTION",
+        "OPEN"
+      ]
+    },
+    {
+      "field": "evidenceOrRationale",
+      "required": true
+    },
+    {
+      "field": "affectedCardIds",
+      "required": true
+    },
+    {
+      "field": "revisitCondition",
+      "required": true
+    },
+    {
+      "field": "verificationLink",
+      "required": false
+    }
+  ],
+  "conditionTemplates": [
+    {
+      "id": "T2-A",
+      "name": "ordinary_design",
+      "instruction": "Produce a design from the approved initial brief; no future changes are disclosed."
+    },
+    {
+      "id": "T2-B",
+      "name": "generic_extensibility",
+      "instruction": "Consider that requirements may evolve; avoid unnecessary complexity."
+    },
+    {
+      "id": "T2-C",
+      "name": "change_aware_without_overengineering",
+      "instruction": "Identify likely change-sensitive decisions, but keep the design simple and avoid speculative features."
+    },
+    {
+      "id": "T2-D",
+      "name": "explicit_revision_ledger",
+      "instruction": "Use the revisionLedgerSchema to label decisions and trace impact/revisit conditions. Do not infer or implement undisclosed future requirements."
+    }
+  ],
+  "exposureRules": {
+    "initialDesignMustNotContainHeldOutChangeText": true,
+    "deliverInitialDesignBeforeReleasingChangeRequests": true,
+    "releaseChangesOneAtATime": true,
+    "keepGoldTestsResearcherOnly": true
+  },
+  "evaluationPlaceholders": [
+    "initial requirement satisfaction",
+    "post-change acceptance tests",
+    "regressions",
+    "impacted and missed cards",
+    "change effort and modified files/LOC as secondary signals",
+    "overdesign and total cost"
+  ],
+  "readiness": {
+    "readyForRun": false,
+    "blockers": [
+      "approved base brief absent",
+      "held-out change set and gold tests not finalized",
+      "card relationship graph not reviewed"
+    ]
+  },
+  "revisionStage": {
+    "heldOutChangeFile": "07_트랙2_후속변경_연구자전용.json",
+    "releaseOneAtATime": true,
+    "includeChangeTextInInitialPrompt": false
+  }
+}

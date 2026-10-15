@@ -1,0 +1,156 @@
+{
+  "goals": [
+    "Provide a robust 1:1 counseling booking system with SQLite persistence.",
+    "Ensure atomic booking operations to prevent double-booking of slots.",
+    "Implement a clean separation between database access and domain logic.",
+    "Guarantee test isolation and reproducible results using a dedicated test suite."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots",
+        "Manage their own schedule"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Provisioning",
+      "steps": [
+        "Counselor provides counselor_id and start_time",
+        "System validates ISO 8601 format",
+        "System persists slot as 'available'"
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client queries available slots (optional filter by counselor/date)",
+        "Client requests booking for a specific slot",
+        "System atomically checks availability and marks slot as booked",
+        "System generates UUID and records booking as 'CONFIRMED'"
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and client_email",
+        "System verifies email ownership",
+        "System updates booking status to 'CANCELLED'",
+        "System marks the associated slot as 'available' again"
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Integer (Primary Key)",
+        "counselor_id": "String",
+        "start_time": "String (ISO 8601)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "String (UUID, Primary Key)",
+        "slot_id": "Integer (Foreign Key -> Slot)",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "String (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE",
+        "BOOKED"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is AVAILABLE.",
+    "Booking a slot must be an atomic operation (Transaction) to prevent race conditions.",
+    "Only the client with the matching email can lookup or cancel a booking.",
+    "Cancelling a booking must immediately return the associated slot to AVAILABLE state.",
+    "All time-based queries and storage must respect the Asia/Seoul timezone offset."
+  ],
+  "ui_views": [
+    {
+      "view": "API Interface",
+      "description": "The CounselingService class provides the public interface for all operations (no GUI)."
+    }
+  ],
+  "edge_cases": [
+    {
+      "scenario": "Concurrent Booking",
+      "handling": "Use SQLite 'BEGIN IMMEDIATE' transactions to lock the database during the check-and-update phase of booking."
+    },
+    {
+      "scenario": "Invalid Timezone/Format",
+      "handling": "Strict validation of ISO 8601 strings; raise ValueError if format is incorrect."
+    },
+    {
+      "scenario": "Cancellation of already cancelled booking",
+      "handling": "Raise a domain-specific exception if the booking status is already 'CANCELLED'."
+    },
+    {
+      "scenario": "Email Mismatch",
+      "handling": "Return a 'Booking Not Found' or 'Unauthorized' error if the provided email does not match the record."
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "Surrogate Key for Slots",
+      "rationale": "Using an integer slot_id as PK instead of a composite (counselor_id, start_time) simplifies foreign key relationships in the Booking table and improves indexing performance.",
+      "rejected": "Composite PK (counselor_id, start_time)."
+    },
+    {
+      "decision": "ISO 8601 String Storage",
+      "rationale": "SQLite lacks a native DateTime type. Storing as ISO 8601 strings ensures timezone offsets (Asia/Seoul) are preserved and allows for lexicographical sorting/filtering.",
+      "rejected": "Unix timestamps (lose timezone context)."
+    },
+    {
+      "decision": "Layered Architecture (P4)",
+      "rationale": "Separate the `DatabaseManager` (SQL execution) from the `CounselingService` (Business Logic) to allow for easier testing and potential storage swaps.",
+      "rejected": "Putting SQL queries directly inside the service methods."
+    },
+    {
+      "decision": "In-Memory SQLite for Tests (P1)",
+      "rationale": "Using ':memory:' for pytest ensures zero leaking state between test cases and high execution speed.",
+      "rejected": "Using a shared test.sqlite3 file."
+    }
+  ],
+  "assumptions": [
+    "The system assumes the client provides a valid email address for verification.",
+    "The system assumes that '30-minute slots' are pre-defined by the counselor and not dynamically calculated from a range."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "traceability_map": {
+      "create_booking": "CounselingService.create_booking -> DBManager.get_slot -> DBManager.update_slot -> DBManager.insert_booking",
+      "cancel_booking": "CounselingService.cancel_booking -> DBManager.get_booking -> DBManager.update_booking_status -> DBManager.update_slot_status",
+      "exception_chain": "DatabaseError -> CounselingService (wrap as) -> BookingDomainException"
+    }
+  }
+}

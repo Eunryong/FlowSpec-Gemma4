@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "run_id": "20261014T065533Z_track2_cond3_invariant_r001_6a7ef591",
+  "task_id": "brief_v2_large",
+  "timestamp": "2026-10-14T06:55:33.721436+00:00",
+  "track": "track2",
+  "condition": "cond3_invariant",
+  "repetition_index": 1,
+  "repetitions": 1,
+  "model_identifier": "local-model",
+  "model_server_configuration": {
+    "base_url": "http://127.0.0.1:8080/v1",
+    "descriptor": null
+  },
+  "model_configuration": {
+    "temperature": 0.2,
+    "seed": null,
+    "context_length": 12288,
+    "max_output_tokens": 4608,
+    "timeout_seconds": 300.0,
+    "max_agent_steps": 15
+  },
+  "brief_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/briefs/brief_v2_large.md",
+    "snapshot": "inputs/brief.md",
+    "sha256": "66d6c47efc142980b4b0834558474004f27c209b9ea8bac163c0ae947d38d36c"
+  },
+  "condition_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/conditions/track2/cond3_invariant.md",
+    "snapshot": "inputs/condition.md",
+    "sha256": "62e21d6a13486c025bd4abe93d965b2be1d9ac1d3c9f7afe95b9aba85a019ace"
+  },
+  "design_schema": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/schemas/design-specification.schema.json",
+    "snapshot": "inputs/design-schema.json",
+    "sha256": "57d692c197247c0ce0041571e00817f153c32438e10fa806f2130909642cc5e3"
+  },
+  "harness_prompts": {
+    "designer": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/designer-common.md",
+      "sha256": "2a4ee14039f84eb600b9dfe575a7fff91997b15de7d0d6a9cf98a9031898405d"
+    },
+    "coder": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/coder-common.md",
+      "sha256": "6bc68c5cc57e5f6a78d81380bf34817b23771717b2298ec33e9c393d633a09a4"
+    }
+  },
+  "design_output_sha256": "05fa1ef81389050877e9ffe4f6ee6cb329d955c58a1971b3bc61ae7acfac2d40",
+  "implementation_workspace": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/runs/20261014T065533Z_track2_cond3_invariant_r001_6a7ef591/implementation",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source": null
+  },
+  "git_commit": null,
+  "design_status": "valid",
+  "implementation_status": "not_started",
+  "run_status": "design_complete",
+  "revisions": [],
+  "metrics_files": {
+    "design": "metrics/design.json"
+  }
+}

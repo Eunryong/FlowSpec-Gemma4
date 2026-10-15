@@ -1,0 +1,1 @@
+The installed run-experiment command provides environment checks, design and full runs, revisions, metadata lookup, group verification, and exports. This directory is reserved for reproducible analysis scripts; no study-specific scoring script is included.

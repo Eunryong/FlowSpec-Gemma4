@@ -1,0 +1,181 @@
+{
+  "goals": [
+    "Implement a transactional commerce engine coordinating inventory, payments, and promotions.",
+    "Ensure strict financial integrity using a double-entry ledger with idempotency.",
+    "Manage a multi-step order lifecycle using a Saga pattern with automatic compensating rollbacks.",
+    "Maintain strict inventory invariants across available and reserved stock states.",
+    "Provide a global reconciliation mechanism to verify system-wide accounting balance."
+  ],
+  "actors": [
+    "Customer (performs checkout, deposits funds, cancels orders)",
+    "Warehouse Manager (registers products, ships orders)",
+    "System Administrator (creates coupons, monitors reconciliation)"
+  ],
+  "user_flows": [
+    "Successful Checkout: Validate stock/coupon -> Reserve stock/quota -> Debit wallet -> Transition to PAID.",
+    "Failed Payment Checkout: Validate stock/coupon -> Reserve stock/quota -> Payment fails -> Rollback stock/quota -> Transition to FAILED_PAYMENT.",
+    "Order Fulfillment: Transition PAID order to SHIPPED -> Commit inventory (decrement reserved stock).",
+    "Order Cancellation (Paid): Transition PAID order to CANCELLED -> Refund wallet -> Restore stock/quota.",
+    "Order Cancellation (Reserved): Transition RESERVED order to CANCELLED -> Restore stock/quota."
+  ],
+  "domain_entities": [
+    {
+      "name": "Product",
+      "attributes": ["sku", "name", "price_cents", "available_stock", "reserved_stock"]
+    },
+    {
+      "name": "Wallet",
+      "attributes": ["customer_id", "balance_cents"]
+    },
+    {
+      "name": "LedgerEntry",
+      "attributes": ["entry_id", "customer_id", "order_id", "entry_type (DEBIT/CREDIT)", "amount_cents", "idempotency_key"]
+    },
+    {
+      "name": "Coupon",
+      "attributes": ["code", "discount_percent", "max_uses", "current_uses", "min_order_cents"]
+    },
+    {
+      "name": "Order",
+      "attributes": ["order_id", "customer_id", "items", "subtotal_cents", "discount_cents", "final_total_cents", "status", "coupon_code"]
+    },
+    {
+      "name": "AuditLog",
+      "attributes": ["log_id", "order_id", "event_type", "from_state", "to_state", "timestamp"]
+    }
+  ],
+  "states": [
+    {
+      "state": "RESERVED",
+      "description": "Stock and coupon quota are held; payment is pending.",
+      "valid_transitions": ["PAID", "CANCELLED", "FAILED_PAYMENT"]
+    },
+    {
+      "state": "PAID",
+      "description": "Payment successfully debited from wallet.",
+      "valid_transitions": ["SHIPPED", "CANCELLED"]
+    },
+    {
+      "state": "SHIPPED",
+      "description": "Terminal state: Goods have left the warehouse.",
+      "valid_transitions": []
+    },
+    {
+      "state": "CANCELLED",
+      "description": "Terminal state: Order voided, resources restored.",
+      "valid_transitions": []
+    },
+    {
+      "state": "FAILED_PAYMENT",
+      "description": "Terminal state: Payment failed, resources restored.",
+      "valid_transitions": []
+    }
+  ],
+  "business_rules": [
+    {
+      "rule": "Stock Conservation Invariant",
+      "description": "For any product, (available_stock + reserved_stock) must equal the total stock registered minus total shipped stock."
+    },
+    {
+      "rule": "Wallet Non-Negativity",
+      "description": "A wallet balance must never drop below 0 cents. Any transaction that would result in a negative balance must be rejected."
+    },
+    {
+      "rule": "Ledger Idempotency",
+      "description": "Any ledger operation with a previously used idempotency_key must return the original result without mutating the balance again."
+    },
+    {
+      "rule": "Coupon Quota Integrity",
+      "description": "current_uses must be incremented upon reservation and decremented only if the order transitions to CANCELLED or FAILED_PAYMENT."
+    },
+    {
+      "rule": "Saga Atomicity",
+      "description": "The checkout process must be atomic. If payment fails, all previous steps (stock reservation, coupon usage) must be rolled back in reverse order."
+    },
+    {
+      "rule": "Reconciliation Formula",
+      "description": "net_captured_cents (Sum of DEBITS - Sum of CREDIT refunds) must equal the sum of final_total_cents for all orders in PAID or SHIPPED status."
+    }
+  ],
+  "ui_views": [
+    {
+      "view": "Order Audit Log",
+      "description": "Chronological list of state transitions for a specific order_id."
+    },
+    {
+      "view": "System Reconciliation Report",
+      "description": "Summary of total debits, refunds, net captured, and balance boolean."
+    }
+  ],
+  "edge_cases": [
+    {
+      "case": "Insufficient Stock for Partial Order",
+      "assertion": "If one item in a multi-item order is unavailable, no items for that order should be reserved; raise ValueError."
+    },
+    {
+      "case": "Duplicate Idempotency Key on Deposit",
+      "assertion": "Calling deposit_funds twice with the same key must only increase balance once."
+    },
+    {
+      "case": "Coupon Exhaustion",
+      "assertion": "If current_uses == max_uses, the coupon must be rejected during checkout."
+    },
+    {
+      "case": "Cancellation of Shipped Order",
+      "assertion": "Attempting to cancel an order in SHIPPED state must raise ValueError."
+    },
+    {
+      "case": "Payment Failure Rollback",
+      "assertion": "Verify that available_stock returns to previous value and coupon current_uses is decremented after FAILED_PAYMENT."
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "SQLite Persistence",
+      "rationale": "Ensures ACID compliance for transactions. A single persistent sqlite3.Connection instance will be used per CommerceEngine to maintain :memory: state."
+    },
+    {
+      "decision": "Double-Entry Ledger",
+      "rationale": "Using a ledger instead of just a balance column prevents data loss and provides a verifiable audit trail for all financial movements."
+    },
+    {
+      "decision": "Two-Phase Stock Lifecycle",
+      "rationale": "Separating available and reserved stock prevents 'overselling' while items are awaiting payment."
+    },
+    {
+      "decision": "Compensating Transaction Pattern",
+      "rationale": "Since the process spans multiple domain concerns (Inventory, Wallet, Coupons), a Saga pattern with explicit rollback logic is used to maintain consistency."
+    }
+  ],
+  "assumptions": [
+    "All currency calculations are performed in cents (integers) to avoid floating-point precision errors.",
+    "The system is standalone and does not require external API calls for payment processing.",
+    "The `idempotency_key` is provided by the caller and is unique per logical transaction."
+  ],
+  "unresolved_items": [
+    "Handling of concurrent requests to the same SKU (SQLite locking strategy).",
+    "Maximum history depth for the audit log."
+  ],
+  "extensions": {
+    "invariant_checks": {
+      "stock_check": "ASSERT available_stock >= 0 AND reserved_stock >= 0",
+      "wallet_check": "ASSERT balance_cents >= 0",
+      "coupon_check": "ASSERT current_uses <= max_uses"
+    },
+    "rollback_sequence": {
+      "checkout_failure": [
+        "Decrement coupon.current_uses",
+        "Decrement product.reserved_stock",
+        "Increment product.available_stock",
+        "Set order.status = 'FAILED_PAYMENT'"
+      ],
+      "order_cancellation": [
+        "Decrement product.reserved_stock",
+        "Increment product.available_stock",
+        "Decrement coupon.current_uses (if applicable)",
+        "Insert CREDIT ledger entry (if PAID)",
+        "Set order.status = 'CANCELLED'"
+      ]
+    }
+  }
+}

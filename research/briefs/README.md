@@ -1,0 +1,1 @@
+Place a common service brief here when it is ready. Runs accept Markdown or JSON files from any path and snapshot the bytes into that run's inputs directory. The placeholder contains no service requirements.

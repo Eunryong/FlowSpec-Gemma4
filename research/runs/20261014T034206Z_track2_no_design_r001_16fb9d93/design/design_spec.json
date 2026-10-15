@@ -1,0 +1,138 @@
+{
+  "goals": [
+    "Implement a transactional commerce engine with strong consistency across inventory, payments, and promotions.",
+    "Ensure financial integrity using a double-entry idempotent ledger.",
+    "Manage product stock using a two-phase reservation lifecycle (Available -> Reserved -> Committed/Released).",
+    "Coordinate complex order workflows using a Saga pattern with automatic compensating transactions for failures.",
+    "Provide a full audit trail for order state transitions and a global reconciliation mechanism for accounting."
+  ],
+  "actors": [
+    "Customer: Initiates orders, manages wallet funds, and applies coupons.",
+    "Warehouse Manager: Registers products and manages initial stock levels.",
+    "Saga Coordinator: The internal engine logic that manages the transition between order states and triggers rollbacks.",
+    "System Auditor: Reviews audit logs and performs global reconciliation."
+  ],
+  "user_flows": [
+    "Product Onboarding: Register product -> Set initial stock -> Verify availability.",
+    "Wallet Funding: Create wallet -> Deposit funds with idempotency key -> Verify balance.",
+    "Successful Checkout: Place order -> Reserve stock -> Apply coupon -> Process payment -> Transition to PAID.",
+    "Failed Payment Flow: Place order -> Reserve stock -> Apply coupon -> Payment fails -> Rollback stock/coupon -> Transition to FAILED_PAYMENT.",
+    "Order Fulfillment: PAID order -> Ship order -> Commit stock (decrement reserved) -> Transition to SHIPPED.",
+    "Order Cancellation: PAID/RESERVED order -> Cancel order -> Release stock -> Restore coupon quota -> Refund payment (if PAID) -> Transition to CANCELLED."
+  ],
+  "domain_entities": [
+    {
+      "entity": "Product",
+      "attributes": [
+        "sku",
+        "name",
+        "price_cents",
+        "available_stock",
+        "reserved_stock"
+      ]
+    },
+    {
+      "entity": "Wallet",
+      "attributes": [
+        "customer_id",
+        "balance_cents"
+      ]
+    },
+    {
+      "entity": "LedgerEntry",
+      "attributes": [
+        "entry_id",
+        "customer_id",
+        "order_id",
+        "entry_type (DEBIT/CREDIT)",
+        "amount_cents",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Coupon",
+      "attributes": [
+        "code",
+        "discount_percent",
+        "max_uses",
+        "current_uses",
+        "min_order_cents"
+      ]
+    },
+    {
+      "entity": "Order",
+      "attributes": [
+        "order_id",
+        "customer_id",
+        "status",
+        "subtotal_cents",
+        "discount_cents",
+        "final_total_cents",
+        "coupon_code"
+      ]
+    },
+    {
+      "entity": "OrderItem",
+      "attributes": [
+        "order_id",
+        "sku",
+        "quantity"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": [
+        "order_id",
+        "event_type",
+        "from_state",
+        "to_state",
+        "timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Order",
+      "states": [
+        "RESERVED",
+        "PAID",
+        "SHIPPED",
+        "CANCELLED",
+        "FAILED_PAYMENT"
+      ]
+    }
+  ],
+  "business_rules": [
+    "Stock Reservation: All items in an order must be available; otherwise, no stock is reserved (atomic reservation).",
+    "Stock Lifecycle: available_stock decreases on reservation, reserved_stock increases on reservation, reserved_stock decreases on shipment (commit) or cancellation (release).",
+    "Payment Idempotency: Ledger entries with the same idempotency_key must not result in duplicate balance changes.",
+    "Wallet Invariant: balance_cents must never be less than 0.",
+    "Coupon Validation: Must check existence, current_uses < max_uses, and subtotal >= min_order_cents.",
+    "Coupon Restoration: current_uses must be decremented if an order is cancelled or fails payment after the coupon was applied.",
+    "State Transitions: Only PAID orders can be SHIPPED. Only PAID or RESERVED orders can be CANCELLED.",
+    "Financial Reconciliation: Net captured cents (Debits - Credits) must equal the sum of final_total_cents for all PAID and SHIPPED orders."
+  ],
+  "ui_views": [
+    "CommerceEngine API: Public methods for register_product, get_product, create_wallet, deposit_funds, get_wallet_balance, create_coupon, checkout_order, ship_order, cancel_order, get_order_audit_log, and get_system_reconciliation."
+  ],
+  "edge_cases": [
+    "Order containing duplicate SKUs: Quantities must be aggregated before stock validation.",
+    "Concurrent payment attempts: Idempotency keys must prevent double-charging.",
+    "Coupon quota exhaustion: A coupon reaching max_uses exactly during the reservation phase of a checkout.",
+    "Cancellation of a FAILED_PAYMENT order: Should be disallowed by state machine guards.",
+    "Zero-cent orders: Handling cases where discounts might result in 0 total (though price_cents > 0 is required for products).",
+    "Database connection persistence: Ensuring :memory: DB remains active for the instance lifecycle."
+  ],
+  "design_decisions": [
+    "Persistence: Use SQLite for ACID compliance to ensure that multi-table updates (e.g., stock and order status) are atomic.",
+    "Currency: Use integer cents for all monetary values to avoid floating-point precision errors.",
+    "Saga Pattern: Implement the checkout process as a sequence of steps with explicit compensating actions (rollback) to maintain consistency without distributed locks.",
+    "Double-Entry Ledger: Use an append-only ledger for all wallet changes to provide a verifiable audit trail of funds."
+  ],
+  "assumptions": [
+    "The system operates in a single-process environment where SQLite's default locking is sufficient.",
+    "The `idempotency_key` is provided by the caller and is unique per logical transaction.",
+    "All product prices and quantities are positive integers."
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,6 @@
+{
+  "valid": false,
+  "parse_error": "Expecting property name enclosed in double quotes: line 116 column 12 (char 4303)",
+  "schema_errors": [],
+  "auto_corrected": false
+}

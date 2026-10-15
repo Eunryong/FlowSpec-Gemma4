@@ -1,0 +1,6 @@
+{
+  "valid": false,
+  "parse_error": "Unterminated string starting at: line 120 column 9 (char 3923)",
+  "schema_errors": [],
+  "auto_corrected": false
+}

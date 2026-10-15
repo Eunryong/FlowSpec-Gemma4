@@ -1,0 +1,117 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking system with integrated session pass management.",
+    "Ensure strict data integrity for session quotas using an idempotent ledger system.",
+    "Provide an atomic rescheduling mechanism to prevent slot leakage or double-booking.",
+    "Automate waitlist promotion based on FIFO priority and session availability.",
+    "Maintain a comprehensive audit trail and system-wide reconciliation check for financial/quota integrity."
+  ],
+  "actors": [
+    "Counselor: Provides availability and manages slots.",
+    "Client: Purchases session passes, books, reschedules, and cancels appointments.",
+    "System: Handles automatic waitlist promotion and reconciliation audits."
+  ],
+  "user_flows": [
+    "Counselor Setup: Register Counselor -> Add Available Slots -> (Optional) Block specific slots.",
+    "Pass Acquisition: Client provides email and idempotency key -> System issues session pass -> Ledger records 'ISSUE'.",
+    "Booking Process: Client selects available slot -> System verifies session balance -> System atomically marks slot 'BOOKED', deducts session, and creates 'CONFIRMED' booking.",
+    "Rescheduling Process: Client requests new slot -> System verifies target slot availability -> System atomically releases old slot (triggering waitlist check) and occupies new slot.",
+    "Cancellation & Promotion: Client cancels booking -> System restores session -> System checks FIFO waitlist -> First eligible client with sessions is promoted to 'CONFIRMED' booking."
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "attributes": ["counselor_id", "name", "specialty"]
+    },
+    {
+      "entity": "Slot",
+      "attributes": ["slot_id", "counselor_id", "start_time", "status"]
+    },
+    {
+      "entity": "SessionPass",
+      "attributes": ["client_email", "remaining_sessions", "used_sessions"]
+    },
+    {
+      "entity": "PassLedger",
+      "attributes": ["entry_id", "client_email", "booking_id", "entry_type", "delta_sessions", "idempotency_key"]
+    },
+    {
+      "entity": "Booking",
+      "attributes": ["booking_id", "counselor_id", "start_time", "client_name", "client_email", "status", "idempotency_key"]
+    },
+    {
+      "entity": "Waitlist",
+      "attributes": ["waitlist_id", "counselor_id", "start_time", "client_name", "client_email", "status"]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": ["log_id", "booking_id", "event_type", "from_status", "to_status", "timestamp"]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "values": ["AVAILABLE", "BOOKED", "BLOCKED"]
+    },
+    {
+      "entity": "Booking",
+      "values": ["CONFIRMED", "CANCELLED"]
+    },
+    {
+      "entity": "Waitlist",
+      "values": ["WAITING", "PROMOTED"]
+    },
+    {
+      "entity": "PassLedger.entry_type",
+      "values": ["ISSUE", "USE", "RESTORE"]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be blocked if its current status is 'AVAILABLE'.",
+    "A booking requires the client to have at least 1 remaining session.",
+    "Session pass issuance must be idempotent based on the provided idempotency_key.",
+    "Booking creation must be idempotent based on the provided idempotency_key.",
+    "Waitlist entries are only permitted for slots with status 'BOOKED'.",
+    "Waitlist promotion follows FIFO order and requires the promoted client to have >= 1 session at the moment of promotion.",
+    "Rescheduling must be atomic: the old slot is released and the new slot is occupied in one transaction.",
+    "System Reconciliation Invariant: Total Issued = Total Remaining + Total Used; Total Used = Active Bookings = Booked Slots."
+  ],
+  "ui_views": [
+    "API: register_counselor(counselor_id, name, specialty)",
+    "API: add_slot(counselor_id, start_time)",
+    "API: block_slot(counselor_id, start_time)",
+    "API: query_available_slots(counselor_id, date_prefix)",
+    "API: issue_session_pass(client_email, sessions_to_add, idempotency_key)",
+    "API: get_session_pass(client_email)",
+    "API: create_booking(counselor_id, start_time, client_name, client_email, idempotency_key)",
+    "API: lookup_booking(booking_id, client_email)",
+    "API: reschedule_booking(booking_id, client_email, new_counselor_id, new_start_time)",
+    "API: join_waitlist(counselor_id, start_time, client_name, client_email)",
+    "API: cancel_booking(booking_id, client_email)",
+    "API: get_booking_audit_log(booking_id)",
+    "API: get_system_reconciliation()"
+  ],
+  "edge_cases": [
+    "Client attempts to book with exactly 0 sessions.",
+    "Client attempts to reschedule to a slot that was just blocked or booked by another user.",
+    "Waitlist promotion fails because the first person in line has exhausted their sessions.",
+    "Duplicate idempotency keys used for session top-ups.",
+    "Cancellation of a booking that has no waitlist entries.",
+    "Rescheduling a booking that has already been cancelled."
+  ],
+  "design_decisions": [
+    "Use SQLite for persistence to ensure ACID properties during complex booking/promotion transactions.",
+    "Implement a ledger-based approach for session passes to prevent race conditions and provide a full audit trail of quota changes.",
+    "Use ISO 8601 strings for date/time to ensure consistent sorting and filtering in SQLite.",
+    "Enforce a strict 'Single Transaction' policy for the Rescheduling Saga and Cancellation/Promotion flow to prevent orphaned slots."
+  ],
+  "assumptions": [
+    "The system operates in a single-timezone context or handles offsets via ISO 8601 strings.",
+    "The `client_email` serves as the primary unique identifier for clients.",
+    "The `idempotency_key` is generated and managed by the calling client/frontend."
+  ],
+  "unresolved_items": [
+    "Whether to implement a maximum limit on the number of sessions a client can hold.",
+    "The specific format of the `booking_id` (UUID vs Integer)."
+  ]
+}

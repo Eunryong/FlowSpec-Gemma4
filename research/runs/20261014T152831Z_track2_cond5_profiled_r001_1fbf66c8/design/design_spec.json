@@ -1,0 +1,161 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking engine with SQLite persistence.",
+    "Ensure strict session pass conservation and idempotency for all quota changes.",
+    "Enable atomic booking rescheduling and FIFO waitlist auto-promotion.",
+    "Provide system-wide reconciliation and audit logging for integrity verification."
+  ],
+  "actors": [
+    "Counselor (Schedule owner)",
+    "Client (Booking requester/Pass holder)",
+    "System (Automated promotion and reconciliation engine)"
+  ],
+  "user_flows": [
+    {
+      "flow": "Booking Creation",
+      "steps": "[Idempotency Check] -> [Slot Availability Guard] -> [Client Session Guard] -> [Atomic Transaction: Mark Slot BOOKED, Deduct Session, Create Booking, Log Audit] -> [Return Booking]"
+    },
+    {
+      "flow": "Atomic Rescheduling",
+      "steps": "[Permission/Status Guard] -> [Target Slot Availability Guard] -> [Atomic Transaction: Release Old Slot (with Waitlist Check), Occupy New Slot, Update Booking, Log Audit] -> [Return Booking]"
+    },
+    {
+      "flow": "Cancellation & Promotion",
+      "steps": "[Permission Guard] -> [Atomic Transaction: Mark Booking CANCELLED, Restore Session, Log Audit] -> [Waitlist FIFO Scan: Find first client with sessions >= 1] -> [If found: Mark PROMOTED, Deduct Session, Create Booking, Log Audit; Else: Mark Slot AVAILABLE] -> [Return Booking]"
+    },
+    {
+      "flow": "Session Top-up",
+      "steps": "[Idempotency Key Check in pass_ledger] -> [If new: Atomic Transaction: Update session_passes, Insert pass_ledger entry] -> [Return Pass Status]"
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "attributes": [
+        "counselor_id",
+        "name",
+        "specialty"
+      ]
+    },
+    {
+      "entity": "Slot",
+      "attributes": [
+        "slot_id",
+        "counselor_id",
+        "start_time",
+        "status"
+      ]
+    },
+    {
+      "entity": "SessionPass",
+      "attributes": [
+        "client_email",
+        "remaining_sessions",
+        "used_sessions"
+      ]
+    },
+    {
+      "entity": "PassLedger",
+      "attributes": [
+        "entry_id",
+        "client_email",
+        "booking_id",
+        "entry_type",
+        "delta_sessions",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "attributes": [
+        "booking_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Waitlist",
+      "attributes": [
+        "waitlist_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": [
+        "log_id",
+        "booking_id",
+        "event_type",
+        "from_status",
+        "to_status",
+        "timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "values": [
+        "AVAILABLE",
+        "BOOKED",
+        "BLOCKED"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "values": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    },
+    {
+      "entity": "Waitlist",
+      "values": [
+        "WAITING",
+        "PROMOTED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "Session Conservation: total_issued = total_remaining + total_used.",
+    "Slot Integrity: A slot cannot be BOOKED if it is BLOCKED or already BOOKED.",
+    "Waitlist Eligibility: Only clients with remaining_sessions >= 1 can join or be promoted from the waitlist.",
+    "FIFO Promotion: The first waitlisted client in order of insertion who has sufficient sessions is promoted.",
+    "Idempotency: Duplicate idempotency_keys in pass_ledger or bookings must not trigger duplicate state changes."
+  ],
+  "ui_views": [],
+  "edge_cases": [
+    "Rescheduling into a slot that is currently being cancelled by another process (handled by SQLite transactions).",
+    "Waitlist promotion where the first person in line has 0 sessions (must skip to the next eligible person).",
+    "Cancellation of a booking where no waitlisted clients exist (slot must return to AVAILABLE).",
+    "Attempting to block a slot that is already BOOKED (must raise ValueError)."
+  ],
+  "design_decisions": [
+    "Persistence: Single `sqlite3.Connection` instance maintained in `CounselingBookingEngine` to support `:memory:` mode.",
+    "Atomicity: Use `with self.conn:` context managers to wrap all multi-step mutations (Sagas) to ensure rollback on failure.",
+    "Waitlist Query: Use `ORDER BY waitlist_id ASC` (assuming autoincrement) to implement FIFO logic.",
+    "Idempotency: Use a unique constraint on `pass_ledger.idempotency_key` to prevent double-counting sessions."
+  ],
+  "assumptions": [
+    "ISO 8601 strings are used for all time representations to ensure lexicographical sorting in SQLite.",
+    "Client email is the primary identifier for session passes."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "developer_profile": {
+      "P1": "Strict connection management and transaction boundaries.",
+      "P2": "Explicit flow mapping for all public methods.",
+      "P3": "FIFO waitlist and idempotency via ledger tables.",
+      "P4": "Single-module `counseling_engine.py` implementation.",
+      "P5": "Pre-emptive target slot validation before releasing original slots."
+    }
+  }
+}

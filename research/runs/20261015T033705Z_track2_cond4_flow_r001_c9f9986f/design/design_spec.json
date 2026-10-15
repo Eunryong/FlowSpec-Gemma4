@@ -1,0 +1,157 @@
+{
+  "goals": [
+    "Implement a transactional booking engine for 1:1 counseling",
+    "Ensure session pass integrity via an idempotent ledger",
+    "Manage slot lifecycles (AVAILABLE, BOOKED, BLOCKED)",
+    "Implement atomic rescheduling and FIFO waitlist auto-promotion",
+    "Provide global system reconciliation and audit logs"
+  ],
+  "actors": [
+    "Counselor",
+    "Client",
+    "System Administrator"
+  ],
+  "user_flows": [
+    {
+      "flow": "issue_session_pass",
+      "steps": [
+        "1. Check if idempotency_key exists in pass_ledger; if yes, return current pass status.",
+        "2. Validate sessions_to_add > 0 and client_email non-empty.",
+        "3. Transaction: Insert 'ISSUE' entry into pass_ledger; Update/Insert session_passes (remaining_sessions += delta)."
+      ]
+    },
+    {
+      "flow": "create_booking",
+      "steps": [
+        "1. If idempotency_key exists in bookings, return existing booking.",
+        "2. Verify slot exists and status == 'AVAILABLE'.",
+        "3. Verify client remaining_sessions >= 1.",
+        "4. Transaction: Update slot status to 'BOOKED'; Deduct 1 session in session_passes; Insert 'USE' entry in pass_ledger; Insert booking record; Append 'BOOKING_CREATED' audit log.",
+        "5. Return booking dictionary."
+      ]
+    },
+    {
+      "flow": "reschedule_booking",
+      "steps": [
+        "1. Verify booking exists, email matches, and status == 'CONFIRMED'.",
+        "2. Verify target slot exists and status == 'AVAILABLE'.",
+        "3. Transaction: Update old slot to 'AVAILABLE' (or trigger waitlist promotion); Update target slot to 'BOOKED'; Update booking counselor_id and start_time; Append 'BOOKING_RESCHEDULED' audit log.",
+        "4. Return updated booking."
+      ]
+    },
+    {
+      "flow": "cancel_booking",
+      "steps": [
+        "1. Verify booking exists, email matches, and status == 'CONFIRMED'.",
+        "2. Transaction: Set booking status to 'CANCELLED'; Restore 1 session in session_passes; Insert 'RESTORE' entry in pass_ledger; Append 'BOOKING_CANCELLED' audit log.",
+        "3. Waitlist Check: Query FIFO 'WAITING' entries for the slot. Find first client with remaining_sessions >= 1.",
+        "4. If eligible client found: Set waitlist status to 'PROMOTED'; Deduct 1 session; Insert 'USE' ledger entry; Create 'CONFIRMED' booking; Append 'WAITLIST_PROMOTED' audit log; Keep slot 'BOOKED'.",
+        "5. Else: Set slot status to 'AVAILABLE'.",
+        "6. Return cancelled booking."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "table": "counselors",
+      "columns": [
+        "counselor_id (PK), name, specialty"
+      ]
+    },
+    {
+      "entity": "Slot",
+      "table": "slots",
+      "columns": [
+        "slot_id (PK), counselor_id (FK), start_time, status (AVAILABLE, BOOKED, BLOCKED)"
+      ]
+    },
+    {
+      "entity": "SessionPass",
+      "table": "session_passes",
+      "columns": [
+        "client_email (PK), remaining_sessions, used_sessions"
+      ]
+    },
+    {
+      "entity": "PassLedger",
+      "table": "pass_ledger",
+      "columns": [
+        "entry_id (PK), client_email, booking_id, entry_type (ISSUE, USE, RESTORE), delta_sessions, idempotency_key (UNIQUE)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "table": "bookings",
+      "columns": [
+        "booking_id (PK), counselor_id, start_time, client_name, client_email, status (CONFIRMED, CANCELLED), idempotency_key"
+      ]
+    },
+    {
+      "entity": "Waitlist",
+      "table": "waitlist",
+      "columns": [
+        "waitlist_id (PK), counselor_id, start_time, client_name, client_email, status (WAITING, PROMOTED), created_at"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "table": "audit_logs",
+      "columns": [
+        "log_id (PK), booking_id, event_type, from_status, to_status, timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": [
+        "AVAILABLE -> BOOKED",
+        "AVAILABLE -> BLOCKED",
+        "BOOKED -> AVAILABLE",
+        "BLOCKED -> AVAILABLE"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "transitions": [
+        "CONFIRMED -> CANCELLED"
+      ]
+    },
+    {
+      "entity": "WaitlistEntry",
+      "transitions": [
+        "WAITING -> PROMOTED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "Session conservation: total_issued = total_remaining + total_used",
+    "Slot exclusivity: only one booking per (counselor_id, start_time)",
+    "Waitlist eligibility: client must have >= 1 session to join or be promoted",
+    "Idempotency: duplicate idempotency_keys in pass_ledger or bookings must not create duplicate state changes",
+    "Reconciliation: total_used_sessions == active_confirmed_bookings == booked_slots_count"
+  ],
+  "ui_views": [],
+  "edge_cases": [
+    "Rescheduling into a slot that was just blocked",
+    "Cancelling a booking where the only waitlisted client has 0 sessions",
+    "Concurrent booking attempts for the same slot (handled by SQLite transaction)",
+    "Issuing a session pass with a previously used idempotency key"
+  ],
+  "design_decisions": [
+    "Use SQLite :memory: with a single persistent connection to ensure state across calls",
+    "Implement a ledger-based session system to prevent race conditions and provide auditability",
+    "Use ISO 8601 strings for date/time to ensure SQLite sortability",
+    "Atomic transactions wrap all multi-table updates to prevent partial state corruption"
+  ],
+  "assumptions": [
+    "Client email is a unique identifier for session passes",
+    "Waitlist is strictly FIFO based on insertion order",
+    "All time-based queries use the provided date_prefix for filtering"
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "reconciliation_logic": "is_balanced = (sum(ledger.delta) == sum(passes.remaining) + sum(passes.used)) AND (sum(passes.used) == count(bookings.CONFIRMED)) AND (count(bookings.CONFIRMED) == count(slots.BOOKED))"
+  }
+}

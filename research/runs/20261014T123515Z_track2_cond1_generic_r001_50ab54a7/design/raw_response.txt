@@ -1,0 +1,195 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking system with strict state management.",
+    "Ensure session pass integrity through an idempotent ledger system.",
+    "Provide atomic booking operations including rescheduling and waitlist auto-promotion.",
+    "Maintain a comprehensive audit trail and system-wide reconciliation mechanism to verify data consistency."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "description": "Manages their own availability by registering and adding/blocking time slots."
+    },
+    {
+      "role": "Client",
+      "description": "Purchases session passes, books slots, reschedules appointments, and joins waitlists."
+    },
+    {
+      "role": "System Administrator",
+      "description": "Monitors system health and integrity via reconciliation reports and audit logs."
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Counselor registers and adds available slots.",
+        "Client tops up session passes using an idempotency key.",
+        "Client queries available slots for a specific counselor or date.",
+        "Client creates a booking, which atomically deducts a session and marks the slot as BOOKED."
+      ]
+    },
+    {
+      "flow": "Rescheduling Process",
+      "steps": [
+        "Client requests a change of slot for an existing CONFIRMED booking.",
+        "System verifies the target slot is AVAILABLE.",
+        "System atomically releases the old slot (triggering waitlist check) and occupies the new slot."
+      ]
+    },
+    {
+      "flow": "Cancellation and Promotion",
+      "steps": [
+        "Client cancels a CONFIRMED booking.",
+        "System restores the session pass to the client.",
+        "System checks the FIFO waitlist for the vacated slot.",
+        "The first eligible client (with >= 1 session) is automatically promoted to a CONFIRMED booking."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "attributes": [
+        "counselor_id",
+        "name",
+        "specialty"
+      ]
+    },
+    {
+      "entity": "Slot",
+      "attributes": [
+        "slot_id",
+        "counselor_id",
+        "start_time",
+        "status"
+      ]
+    },
+    {
+      "entity": "ClientPass",
+      "attributes": [
+        "client_email",
+        "remaining_sessions",
+        "used_sessions"
+      ]
+    },
+    {
+      "entity": "PassLedger",
+      "attributes": [
+        "entry_id",
+        "client_email",
+        "booking_id",
+        "entry_type",
+        "delta_sessions",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "attributes": [
+        "booking_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Waitlist",
+      "attributes": [
+        "waitlist_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": [
+        "log_id",
+        "booking_id",
+        "event_type",
+        "from_status",
+        "to_status",
+        "timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE",
+        "BOOKED",
+        "BLOCKED"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    },
+    {
+      "entity": "Waitlist",
+      "states": [
+        "WAITING",
+        "PROMOTED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot cannot be booked if it is BLOCKED or already BOOKED.",
+    "A booking cannot be created unless the client has at least 1 remaining session.",
+    "Session pass changes must be idempotent based on the provided idempotency key.",
+    "Waitlist promotion must follow FIFO (First-In-First-Out) order.",
+    "Only clients with remaining sessions can be promoted from the waitlist.",
+    "Rescheduling must be atomic: the original booking must remain intact if the target slot is unavailable.",
+    "Session pass restoration must occur immediately upon booking cancellation."
+  ],
+  "ui_views": [
+    {
+      "view": "Available Slots List",
+      "description": "Filtered list of slots with status AVAILABLE, sorted by start_time."
+    },
+    {
+      "view": "Client Pass Status",
+      "description": "Current remaining and used sessions for a specific email."
+    },
+    {
+      "view": "Booking Audit Trail",
+      "description": "Chronological history of status changes for a specific booking."
+    },
+    {
+      "view": "System Reconciliation Report",
+      "description": "Summary of total issued vs used sessions and booking vs slot counts."
+    }
+  ],
+  "edge_cases": [
+    "Multiple clients attempting to book the same slot simultaneously (handled by SQLite transactions).",
+    "A waitlisted client losing their session pass balance before the slot becomes available.",
+    "Rescheduling a booking to a slot that is currently being cancelled by another process.",
+    "Providing a duplicate idempotency key for a session top-up.",
+    "Attempting to block a slot that has already been booked."
+  ],
+  "design_decisions": [
+    "Use SQLite for persistence to ensure ACID compliance for atomic booking and rescheduling operations.",
+    "Implement a ledger-based approach for session passes to ensure a verifiable audit trail of all quota changes.",
+    "Use ISO 8601 strings for all date-time representations to maintain consistency across queries.",
+    "Utilize UUIDs for booking identifiers to prevent predictable ID enumeration."
+  ],
+  "assumptions": [
+    "Client email is used as the unique identifier for clients.",
+    "All counseling sessions are of a fixed duration (defined by the start_time).",
+    "The system operates in a single-timezone context or handles offsets via ISO 8601."
+  ],
+  "unresolved_items": [
+    "Definition of 'session duration' (currently only start_time is tracked).",
+    "Maximum limit for the waitlist per slot."
+  ]
+}

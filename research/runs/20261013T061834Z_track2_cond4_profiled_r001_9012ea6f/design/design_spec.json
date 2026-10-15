@@ -1,0 +1,188 @@
+{
+  "goals": [
+    "Provide a reliable 1:1 counseling booking system with SQLite persistence.",
+    "Ensure strict atomicity during the booking process to prevent double-booking.",
+    "Implement a clean separation between domain logic and data access layers.",
+    "Guarantee test isolation and reproducible results using a dedicated test suite."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots",
+        "Manage their own schedule"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book an available slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Creation",
+      "steps": [
+        "Counselor provides counselor_id and start_time (ISO 8601).",
+        "System validates timestamp format.",
+        "System persists the slot as 'unbooked' in the database."
+      ]
+    },
+    {
+      "flow": "Slot Discovery",
+      "steps": [
+        "Client requests available slots (optional filter by counselor_id or date).",
+        "System queries slots where is_booked is false.",
+        "System returns a list of matching available slots."
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client provides counselor_id, start_time, name, and email.",
+        "System starts a database transaction.",
+        "System verifies slot existence and current 'unbooked' status.",
+        "System marks slot as 'booked' and creates a Booking record with status 'CONFIRMED'.",
+        "System generates and returns a unique booking_id (UUID).",
+        "System commits the transaction."
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and client_email.",
+        "System verifies the email matches the booking record.",
+        "System updates booking status to 'CANCELLED'.",
+        "System marks the associated slot as 'unbooked'.",
+        "System commits the transaction."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Internal primary key (Integer)",
+        "counselor_id": "String identifier",
+        "start_time": "ISO 8601 String (Asia/Seoul)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "UUID String (Primary Key)",
+        "slot_id": "Foreign Key to Slot",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "Enum (CONFIRMED, CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "Available (is_booked=False)",
+        "Booked (is_booked=True)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if it is currently available (is_booked=False).",
+    "Booking creation must be atomic; two clients cannot book the same slot simultaneously.",
+    "Booking lookup and cancellation require the client_email to match the record for verification.",
+    "Cancelling a booking must immediately return the associated slot to the 'Available' state.",
+    "All timestamps must follow ISO 8601 format with timezone offsets."
+  ],
+  "ui_views": [
+    {
+      "interface": "CounselingService API",
+      "methods": [
+        "add_available_slot(counselor_id, start_time)",
+        "query_available_slots(counselor_id=None, date=None)",
+        "create_booking(counselor_id, start_time, client_name, client_email)",
+        "lookup_booking(booking_id, client_email)",
+        "cancel_booking(booking_id, client_email)"
+      ]
+    }
+  ],
+  "edge_cases": [
+    {
+      "scenario": "Concurrent Booking",
+      "risk": "Race condition where two users book the same slot.",
+      "mitigation": "Use SQLite transactions (BEGIN IMMEDIATE) to lock the database during the check-and-update phase."
+    },
+    {
+      "scenario": "Invalid Email on Cancellation",
+      "risk": "Unauthorized user cancelling someone else's booking.",
+      "mitigation": "Strict equality check between provided email and stored email before updating status."
+    },
+    {
+      "scenario": "Invalid Date Format",
+      "risk": "Database corruption or query failure due to non-ISO strings.",
+      "mitigation": "Validate input strings using datetime.fromisoformat() before persistence."
+    },
+    {
+      "scenario": "Non-existent Slot Booking",
+      "risk": "Booking created for a slot that doesn't exist.",
+      "mitigation": "Verify slot existence in the database before proceeding with booking logic."
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "Layered Architecture (Service -> Repository)",
+      "rationale": "P4: Separation of Concerns. The Service layer handles domain rules (e.g., email verification), while the Repository layer handles SQLite-specific SQL queries.",
+      "rejected_alternatives": [
+        "Single-class monolithic approach (too coupled)",
+        "Full-blown ORM (over-engineering for a simple SQLite requirement)"
+      ]
+    },
+    {
+      "decision": "UUID for booking_id",
+      "rationale": "P3: Prevents ID enumeration attacks and ensures uniqueness across potential future distributed systems.",
+      "rejected_alternatives": [
+        "Auto-incrementing integers (predictable and leak system scale)"
+      ]
+    },
+    {
+      "decision": "ISO 8601 String Storage",
+      "rationale": "P5: SQLite lacks a native DateTime type. Storing as ISO 8601 strings ensures lexicographical sorting and timezone preservation.",
+      "rejected_alternatives": [
+        "Unix timestamps (lose timezone context/readability)"
+      ]
+    },
+    {
+      "decision": "In-memory SQLite for Tests",
+      "rationale": "P1: Test Isolation. Using ':memory:' ensures that each test run starts with a clean slate and does not leave artifacts on disk.",
+      "rejected_alternatives": [
+        "Temporary files (slower, requires cleanup logic)"
+      ]
+    }
+  ],
+  "assumptions": [
+    "The 'Asia/Seoul' timezone is handled by the client providing the correct offset in the ISO 8601 string.",
+    "The system is a standalone library; authentication is handled by the caller (email verification is the only required check).",
+    "SQLite is sufficient for the expected concurrency levels of this service."
+  ],
+  "unresolved_items": [
+    "Whether to implement a specific 'Slot' object or return raw dictionaries/tuples from the query method."
+  ],
+  "extensions": {
+    "traceability_map": {
+      "create_booking": "CounselingService.create_booking -> Repository.get_slot -> Repository.update_slot_status -> Repository.insert_booking",
+      "cancel_booking": "CounselingService.cancel_booking -> Repository.get_booking -> Repository.update_booking_status -> Repository.update_slot_status"
+    }
+  }
+}

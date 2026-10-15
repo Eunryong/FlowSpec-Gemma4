@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "run_id": "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+  "task_id": "brief_v2_counseling_large",
+  "timestamp": "2026-10-15T02:01:14.283407+00:00",
+  "track": "track2",
+  "condition": "cond4_unordered",
+  "repetition_index": 1,
+  "repetitions": 1,
+  "model_identifier": "local-model",
+  "model_server_configuration": {
+    "base_url": "http://127.0.0.1:8080/v1",
+    "descriptor": null
+  },
+  "model_configuration": {
+    "temperature": 0.2,
+    "seed": null,
+    "context_length": 12288,
+    "max_output_tokens": 4608,
+    "timeout_seconds": 900.0,
+    "max_agent_steps": 15
+  },
+  "brief_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/briefs/brief_v2_counseling_large.md",
+    "snapshot": "inputs/brief.md",
+    "sha256": "cc12a03aa4adf1b58c86e547bef2d6d12aacb1a5a10a68c91b879f1424742626"
+  },
+  "condition_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/conditions/track2/cond4_unordered.md",
+    "snapshot": "inputs/condition.md",
+    "sha256": "10eff2727b1c43f5a73dee7ea9d78aee107202d6fe205d389963a4eba5e5f1d8"
+  },
+  "design_schema": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/schemas/design-specification.schema.json",
+    "snapshot": "inputs/design-schema.json",
+    "sha256": "57d692c197247c0ce0041571e00817f153c32438e10fa806f2130909642cc5e3"
+  },
+  "harness_prompts": {
+    "designer": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/designer-common.md",
+      "sha256": "eb1d8fae844a3a4b29de160842c0041fbfc5954c3c8e8d4c7eb5b0bf76b4fd9c"
+    },
+    "coder": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/coder-common.md",
+      "sha256": "6bc68c5cc57e5f6a78d81380bf34817b23771717b2298ec33e9c393d633a09a4"
+    }
+  },
+  "design_output_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+  "implementation_workspace": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/runs/20261015T020114Z_track2_cond4_unordered_r001_f61b6f80/implementation",
+    "sha256": "fd45735113428d06bbf03ecf26567993951d2ccf319f5d6916c5822d37db4870",
+    "source": null
+  },
+  "git_commit": null,
+  "design_status": "fixed",
+  "implementation_status": "completed",
+  "run_status": "completed",
+  "revisions": [],
+  "metrics_files": {
+    "implementation": "metrics/implementation.json"
+  }
+}

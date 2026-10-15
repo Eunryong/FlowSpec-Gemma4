@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "0.2",
+  "artifactType": "track_input_template",
+  "status": "DRAFT_TEMPLATE_NOT_RUNNABLE",
+  "trackId": "T1",
+  "trackName": "Developer Reasoning Profile + Compensation",
+  "baseInputFile": "04_공통_초기요구_템플릿.json",
+  "researchQuestionDraft": "개발자의 반복적으로 관찰된 설계·검토 행동을 적용하면 일반 절차보다 설계/구현 품질이 나아지는가; 장점을 활용하고 체계적 부작용을 보정하면 과잉설계가 줄어드는가?",
+  "onlyIntendedTreatment": "developer reasoning profile and its use policy",
+  "profileSchema": {
+    "profileId": null,
+    "developerConsent": false,
+    "evidenceSessions": [],
+    "patterns": [
+      {
+        "behaviorId": null,
+        "description": null,
+        "observedEvidenceIds": [],
+        "frequency": null,
+        "taskContexts": [],
+        "confidence": null,
+        "developerVerified": false,
+        "expectedBenefit": null,
+        "possibleSideEffect": null
+      }
+    ]
+  },
+  "conditionTemplates": [
+    {
+      "id": "T1-A",
+      "name": "generic_baseline",
+      "profileIncluded": false,
+      "reviewPolicy": "ordinary design request"
+    },
+    {
+      "id": "T1-B",
+      "name": "generic_review_protocol",
+      "profileIncluded": false,
+      "reviewPolicy": "same fixed edge/failure-case checklist for every developer"
+    },
+    {
+      "id": "T1-C",
+      "name": "naive_personalization",
+      "profileIncluded": true,
+      "reviewPolicy": "use profile tendencies directly; no explicit side-effect compensation"
+    },
+    {
+      "id": "T1-D",
+      "name": "compensated_personalization",
+      "profileIncluded": true,
+      "reviewPolicy": "use evidenced strengths; classify findings as implement_now, clarify, defer, or out_of_scope; do not turn every hypothetical into a feature"
+    }
+  ],
+  "controlsToFreeze": [
+    "same approved base brief",
+    "same model/version and tool budget",
+    "same output schema",
+    "same test/evaluation rubric"
+  ],
+  "profileUseGuardrails": [
+    "No inferred profile values are filled by default",
+    "Require repeated evidence and developer review before confirmatory use",
+    "Do not use profile data as hidden product requirements",
+    "Generic-review condition is needed to isolate personalization benefit"
+  ],
+  "evaluationPlaceholders": [
+    "profile accuracy and confidence calibration",
+    "valid issue precision/recall",
+    "requirement and edge-case coverage",
+    "implementation tests",
+    "unnecessary scope/complexity",
+    "time/token/tool cost"
+  ],
+  "readiness": {
+    "readyForRun": false,
+    "blockers": [
+      "approved base brief absent",
+      "participant/profile provenance and consent procedure open",
+      "rubric not defined"
+    ]
+  }
+}

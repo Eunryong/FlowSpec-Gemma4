@@ -1,0 +1,146 @@
+{
+  "goals": [
+    "Provide a robust, standalone Python library for managing 1:1 counseling bookings.",
+    "Ensure data persistence using SQLite with automatic schema initialization.",
+    "Implement a strict booking lifecycle including slot management, atomic booking, and cancellation.",
+    "Guarantee data integrity through formal interface contracts and domain-specific exceptions."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    "Counselor adds a slot -> Client queries slots -> Client books slot -> Booking confirmed.",
+    "Client provides booking_id and email -> System verifies and returns booking details.",
+    "Client provides booking_id and email -> System cancels booking -> Slot becomes available again."
+  ],
+  "domain_entities": [
+    {
+      "name": "Slot",
+      "fields": {
+        "slot_id": "int (Primary Key)",
+        "counselor_id": "str",
+        "start_time": "str (ISO 8601)",
+        "is_booked": "bool"
+      }
+    },
+    {
+      "name": "Booking",
+      "fields": {
+        "booking_id": "str (UUID, Primary Key)",
+        "slot_id": "int (Foreign Key)",
+        "client_name": "str",
+        "client_email": "str",
+        "status": "str (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE (is_booked=False)",
+        "BOOKED (is_booked=True)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if it exists and is currently AVAILABLE.",
+    "Booking creation must be atomic: the slot must be marked as BOOKED and the booking record created in one transaction.",
+    "Booking lookup and cancellation require both the booking_id and the matching client_email for verification.",
+    "Cancelling a booking must transition the booking status to CANCELLED and reset the associated slot to AVAILABLE.",
+    "Slots are defined as 30-minute intervals; the system manages them via start_time."
+  ],
+  "ui_views": [
+    "API: add_available_slot",
+    "API: query_available_slots",
+    "API: create_booking",
+    "API: lookup_booking",
+    "API: cancel_booking"
+  ],
+  "edge_cases": [
+    "Attempting to book a slot that was just booked by another client (Race condition).",
+    "Providing a valid booking_id but an incorrect client_email during cancellation.",
+    "Adding a slot that already exists for a specific counselor at the same time.",
+    "Querying slots for a date that has no available entries."
+  ],
+  "design_decisions": [
+    "Use SQLite for lightweight, file-based persistence.",
+    "Use UUIDs for booking identifiers to prevent predictable ID enumeration.",
+    "Use ISO 8601 strings for dates to ensure timezone consistency (Asia/Seoul).",
+    "Implement custom domain exceptions to distinguish between 'Not Found' and 'Unauthorized' (email mismatch) errors."
+  ],
+  "assumptions": [
+    "The system operates exclusively in the Asia/Seoul timezone.",
+    "The `db_path` provided to the service is writable by the application process.",
+    "Client email is treated as a unique identifier for verification purposes."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "formal_contract": {
+      "data_models": {
+        "Slot": "dataclass(slot_id: int, counselor_id: str, start_time: str, is_booked: bool)",
+        "Booking": "dataclass(booking_id: str, slot_id: int, client_name: str, client_email: str, status: str)"
+      },
+      "service_interface": {
+        "class": "CounselingService",
+        "methods": [
+          {
+            "signature": "add_available_slot(self, counselor_id: str, start_time: str) -> None",
+            "description": "Creates a new available slot. Raises ValueError if slot already exists."
+          },
+          {
+            "signature": "query_available_slots(self, counselor_id: Optional[str] = None, date: Optional[str] = None) -> List[Slot]",
+            "description": "Returns a list of slots where is_booked is False, filtered by counselor_id or date (YYYY-MM-DD)."
+          },
+          {
+            "signature": "create_booking(self, counselor_id: str, start_time: str, client_name: str, client_email: str) -> str",
+            "description": "Books a slot. Returns booking_id. Raises SlotNotFoundError or SlotAlreadyBookedError."
+          },
+          {
+            "signature": "lookup_booking(self, booking_id: str, client_email: str) -> Booking",
+            "description": "Returns booking details. Raises BookingNotFoundError or AuthenticationError if email mismatch."
+          },
+          {
+            "signature": "cancel_booking(self, booking_id: str, client_email: str) -> None",
+            "description": "Cancels booking and re-opens slot. Raises BookingNotFoundError or AuthenticationError."
+          }
+        ],
+        "exceptions": [
+          "SlotNotFoundError",
+          "SlotAlreadyBookedError",
+          "BookingNotFoundError",
+          "AuthenticationError"
+        ]
+      },
+      "storage_definition": {
+        "ddl": [
+          "CREATE TABLE IF NOT EXISTS slots (slot_id INTEGER PRIMARY KEY AUTOINCREMENT, counselor_id TEXT NOT NULL, start_time TEXT NOT NULL, is_booked INTEGER DEFAULT 0, UNIQUE(counselor_id, start_time))",
+          "CREATE TABLE IF NOT EXISTS bookings (booking_id TEXT PRIMARY KEY, slot_id INTEGER NOT NULL, client_name TEXT NOT NULL, client_email TEXT NOT NULL, status TEXT NOT NULL, FOREIGN KEY(slot_id) REFERENCES slots(slot_id))",
+          "CREATE INDEX IF NOT EXISTS idx_slots_counselor ON slots(counselor_id)",
+          "CREATE INDEX IF NOT EXISTS idx_slots_time ON slots(start_time)"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking engine with session pass management",
+    "Ensure atomic rescheduling and cancellation with automatic waitlist promotion",
+    "Guarantee session pass integrity via an idempotent ledger",
+    "Provide system-wide reconciliation and audit logging"
+  ],
+  "actors": [
+    "Counselor",
+    "Client",
+    "System Administrator"
+  ],
+  "user_flows": [
+    "Counselor registers and adds available slots",
+    "Client tops up session pass using an idempotency key",
+    "Client books an available slot (deducting a session)",
+    "Client reschedules a booking to a new available slot",
+    "Client cancels a booking, triggering session restoration and potential waitlist promotion",
+    "Client joins a waitlist for a booked slot"
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "attributes": [
+        "counselor_id",
+        "name",
+        "specialty"
+      ]
+    },
+    {
+      "entity": "Slot",
+      "attributes": [
+        "slot_id",
+        "counselor_id",
+        "start_time",
+        "status"
+      ]
+    },
+    {
+      "entity": "SessionPass",
+      "attributes": [
+        "client_email",
+        "remaining_sessions",
+        "used_sessions"
+      ]
+    },
+    {
+      "entity": "PassLedger",
+      "attributes": [
+        "entry_id",
+        "client_email",
+        "booking_id",
+        "entry_type",
+        "delta_sessions",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "attributes": [
+        "booking_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "WaitlistEntry",
+      "attributes": [
+        "waitlist_id",
+        "counselor_id",
+        "start_time",
+        "client_name",
+        "client_email",
+        "status"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": [
+        "log_id",
+        "booking_id",
+        "event_type",
+        "from_status",
+        "to_status",
+        "timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": [
+        "AVAILABLE -> BOOKED",
+        "AVAILABLE -> BLOCKED",
+        "BOOKED -> AVAILABLE",
+        "BLOCKED -> AVAILABLE"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "transitions": [
+        "CONFIRMED -> CANCELLED"
+      ]
+    },
+    {
+      "entity": "WaitlistEntry",
+      "transitions": [
+        "WAITING -> PROMOTED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "Session Conservation: total_issued = total_remaining + total_used",
+    "Slot Uniqueness: Only one booking per (counselor_id, start_time)",
+    "Waitlist FIFO: First eligible client (remaining_sessions >= 1) is promoted",
+    "Idempotency: Repeated calls with same idempotency_key for pass issuance or booking must not duplicate effects",
+    "Atomic Rescheduling: Target slot must be AVAILABLE; original booking remains CONFIRMED if target is unavailable"
+  ],
+  "ui_views": [],
+  "edge_cases": [
+    "Booking attempt with 0 remaining sessions",
+    "Rescheduling to a slot that was just blocked",
+    "Waitlist promotion where the first person in line has 0 sessions",
+    "Concurrent booking attempts for the same slot (handled by SQLite transactions)",
+    "Cancelling a booking that is already cancelled"
+  ],
+  "design_decisions": [
+    "Use SQLite :memory: with a single persistent connection to maintain state across calls",
+    "Implement a 'Pass Ledger' to ensure every session change is traceable and idempotent",
+    "Use UUIDs for booking_id to ensure global uniqueness",
+    "Enforce FIFO waitlist via auto-incrementing primary keys or timestamps"
+  ],
+  "assumptions": [
+    "Start times are provided in ISO 8601 format",
+    "Client email is the unique identifier for session passes",
+    "Standard library only (sqlite3, uuid, datetime)"
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "database_schema": {
+      "counselors": "CREATE TABLE counselors (counselor_id TEXT PRIMARY KEY, name TEXT NOT NULL, specialty TEXT)",
+      "slots": "CREATE TABLE slots (slot_id TEXT PRIMARY KEY, counselor_id TEXT, start_time TEXT, status TEXT CHECK(status IN ('AVAILABLE', 'BOOKED', 'BLOCKED')))",
+      "session_passes": "CREATE TABLE session_passes (client_email TEXT PRIMARY KEY, remaining_sessions INTEGER, used_sessions INTEGER)",
+      "pass_ledger": "CREATE TABLE pass_ledger (entry_id INTEGER PRIMARY KEY AUTOINCREMENT, client_email TEXT, booking_id TEXT, entry_type TEXT, delta_sessions INTEGER, idempotency_key TEXT UNIQUE)",
+      "bookings": "CREATE TABLE bookings (booking_id TEXT PRIMARY KEY, counselor_id TEXT, start_time TEXT, client_name TEXT, client_email TEXT, status TEXT CHECK(status IN ('CONFIRMED', 'CANCELLED')), idempotency_key TEXT)",
+      "waitlist": "CREATE TABLE waitlist (waitlist_id INTEGER PRIMARY KEY AUTOINCREMENT, counselor_id TEXT, start_time TEXT, client_name TEXT, client_email TEXT, status TEXT CHECK(status IN ('WAITING', 'PROMOTED')))",
+      "audit_logs": "CREATE TABLE audit_logs (log_id INTEGER PRIMARY KEY AUTOINCREMENT, booking_id TEXT, event_type TEXT, from_status TEXT, to_status TEXT, timestamp TEXT)"
+    },
+    "execution_flows": {
+      "issue_session_pass": [
+        "1. Check pass_ledger for idempotency_key; if exists, return current session_pass record",
+        "2. Validate sessions_to_add > 0",
+        "3. Transaction: Update or Insert session_passes (remaining_sessions += sessions_to_add), Insert pass_ledger (entry_type='ISSUE', delta_sessions=sessions_to_add, idempotency_key=key)",
+        "4. Return updated session_pass dictionary"
+      ],
+      "create_booking": [
+        "1. If idempotency_key provided, check bookings table; if exists, return it",
+        "2. Verify slot (counselor_id, start_time) exists and status == 'AVAILABLE'",
+        "3. Verify client_email has remaining_sessions >= 1",
+        "4. Transaction: Update slot status='BOOKED', Update session_passes (remaining -= 1, used += 1), Insert pass_ledger (entry_type='USE', delta=-1), Insert booking (status='CONFIRMED'), Insert audit_log (BOOKING_CREATED)",
+        "5. Return booking dictionary"
+      ],
+      "reschedule_booking": [
+        "1. Verify booking exists, email matches, and status == 'CONFIRMED'",
+        "2. Verify target slot (new_counselor_id, new_start_time) exists and status == 'AVAILABLE'",
+        "3. Transaction: a. Release old slot: Check waitlist for (old_counselor, old_time). If eligible client found, promote them (deduct session, create booking, mark PROMOTED); else set slot 'AVAILABLE'. b. Occupy new slot: set status='BOOKED'. c. Update booking record with new counselor/time. d. Insert audit_log (BOOKING_RESCHEDULED)",
+        "4. Return updated booking dictionary"
+      ],
+      "cancel_booking": [
+        "1. Verify booking exists, email matches, and status == 'CONFIRMED'",
+        "2. Transaction: a. Update booking status='CANCELLED'. b. Restore session: Update session_passes (remaining += 1, used -= 1), Insert pass_ledger (entry_type='RESTORE', delta=1). c. Insert audit_log (BOOKING_CANCELLED). d. Waitlist Promotion: Query WAITING entries for slot FIFO. Find first client with remaining_sessions >= 1. If found: mark PROMOTED, deduct session, create CONFIRMED booking, insert audit_log (WAITLIST_PROMOTED). Else: set slot 'AVAILABLE'.",
+        "3. Return cancelled booking dictionary"
+      ],
+      "get_system_reconciliation": [
+        "1. Calculate total_issued_sessions = SUM(delta_sessions) WHERE entry_type='ISSUE'",
+        "2. Calculate total_remaining_sessions = SUM(remaining_sessions) from session_passes",
+        "3. Calculate total_used_sessions = SUM(used_sessions) from session_passes",
+        "4. Count active_confirmed_bookings = COUNT(*) FROM bookings WHERE status='CONFIRMED'",
+        "5. Count booked_slots_count = COUNT(*) FROM slots WHERE status='BOOKED'",
+        "6. Set is_balanced = (total_issued == total_remaining + total_used) AND (total_used == active_confirmed) AND (active_confirmed == booked_slots_count)",
+        "7. Return reconciliation dictionary"
+      ]
+    }
+  }
+}

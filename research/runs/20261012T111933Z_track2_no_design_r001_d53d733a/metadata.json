@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "run_id": "20261012T111933Z_track2_no_design_r001_d53d733a",
+  "task_id": "brief_v1",
+  "timestamp": "2026-10-12T11:19:33.607269+00:00",
+  "track": "track2",
+  "condition": "no_design",
+  "repetition_index": 1,
+  "repetitions": 1,
+  "model_identifier": "local-model",
+  "model_server_configuration": {
+    "base_url": "http://127.0.0.1:8080/v1",
+    "descriptor": null
+  },
+  "model_configuration": {
+    "temperature": 0.2,
+    "seed": null,
+    "context_length": null,
+    "max_output_tokens": 4096,
+    "timeout_seconds": 300.0,
+    "max_agent_steps": 40
+  },
+  "brief_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/briefs/brief_v1.md",
+    "snapshot": "inputs/brief.md",
+    "sha256": "fbac4b21058484dcc7757d5e73ec3c7d03e6e0412ebd00b37b46cdac7518f8cf"
+  },
+  "condition_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/conditions/track2/no_design.md",
+    "snapshot": "inputs/condition.md",
+    "sha256": "cb0fa3e9333646e014c6c44ae1ca76090cb6d304770a45b26e5d6cd2dbc57c87"
+  },
+  "design_schema": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/schemas/design-specification.schema.json",
+    "snapshot": "inputs/design-schema.json",
+    "sha256": "57d692c197247c0ce0041571e00817f153c32438e10fa806f2130909642cc5e3"
+  },
+  "harness_prompts": {
+    "designer": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/designer-common.md",
+      "sha256": "2a4ee14039f84eb600b9dfe575a7fff91997b15de7d0d6a9cf98a9031898405d"
+    },
+    "coder": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/coder-common.md",
+      "sha256": "6bc68c5cc57e5f6a78d81380bf34817b23771717b2298ec33e9c393d633a09a4"
+    }
+  },
+  "design_output_sha256": null,
+  "implementation_workspace": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/runs/20261012T111933Z_track2_no_design_r001_d53d733a/implementation",
+    "sha256": "5c8d5cf1cfb60cb3f0059dfb9989b284d8563a7ae2da42195c024797bba61ece",
+    "source": null
+  },
+  "git_commit": null,
+  "design_status": "skipped",
+  "implementation_status": "completed",
+  "run_status": "completed",
+  "revisions": [],
+  "metrics_files": {
+    "implementation": "metrics/implementation.json"
+  }
+}

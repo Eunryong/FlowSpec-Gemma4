@@ -1,0 +1,118 @@
+import pytest
+from counseling_service import CounselingService
+import os
+
+@pytest.fixture
+def service():
+    # Use an in-memory database for tests
+    return CounselingService(db_path=":memory:")
+
+def test_add_and_query_slots(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    
+    service.add_available_slot(counselor_id, start_time)
+    
+    # Query all
+    slots = service.query_available_slots()
+    assert len(slots) == 1
+    assert slots[0]['counselor_id'] == counselor_id
+    assert slots[0]['start_time'] == start_time
+    
+    # Query by counselor
+    slots_c = service.query_available_slots(counselor_id=counselor_id)
+    assert len(slots_c) == 1
+    
+    # Query by date
+    slots_d = service.query_available_slots(date="2026-10-20")
+    assert len(slots_d) == 1
+    
+    # Query non-existent date
+    slots_none = service.query_available_slots(date="2026-10-21")
+    assert len(slots_none) == 0
+
+def test_booking_creation(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    client_name = "John Doe"
+    client_email = "john@example.com"
+    
+    service.add_available_slot(counselor_id, start_time)
+    
+    booking_id = service.create_booking(counselor_id, start_time, client_name, client_email)
+    assert booking_id is not None
+    
+    # Verify slot is no longer available
+    slots = service.query_available_slots(counselor_id=counselor_id)
+    assert len(slots) == 0
+    
+    # Verify booking details
+    details = service.lookup_booking(booking_id, client_email)
+    assert details['client_name'] == client_name
+    assert details['status'] == "CONFIRMED"
+
+def test_duplicate_booking_rejection(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    
+    service.add_available_slot(counselor_id, start_time)
+    
+    # First booking
+    service.create_booking(counselor_id, start_time, "User 1", "user1@example.com")
+    
+    # Second booking for same slot should fail
+    with pytest.raises(ValueError, match="Slot is not available or does not exist"):
+        service.create_booking(counselor_id, start_time, "User 2", "user2@example.com")
+
+def test_booking_cancellation_flow(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    client_email = "john@example.com"
+    
+    service.add_available_slot(counselor_id, start_time)
+    booking_id = service.create_booking(counselor_id, start_time, "John Doe", client_email)
+    
+    # Cancel booking
+    service.cancel_booking(booking_id, client_email)
+    
+    # Verify booking status
+    details = service.lookup_booking(booking_id, client_email)
+    assert details['status'] == "CANCELLED"
+    
+    # Verify slot is available again
+    slots = service.query_available_slots(counselor_id=counselor_id)
+    assert len(slots) == 1
+
+def test_authentication_mismatch(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    client_email = "john@example.com"
+    wrong_email = "attacker@example.com"
+    
+    service.add_available_slot(counselor_id, start_time)
+    booking_id = service.create_booking(counselor_id, start_time, "John Doe", client_email)
+    
+    # Lookup with wrong email
+    with pytest.raises(ValueError, match="Booking not found or email mismatch"):
+        service.lookup_booking(booking_id, wrong_email)
+        
+    # Cancel with wrong email
+    with pytest.raises(ValueError, match="Booking not found or email mismatch"):
+        service.cancel_booking(booking_id, wrong_email)
+
+def test_invalid_iso_format(service):
+    with pytest.raises(ValueError, match="Invalid ISO 8601 start_time format"):
+        service.add_available_slot("c1", "2026-10-20 14:00") # Missing T or offset
+
+def test_cancel_already_cancelled(service):
+    counselor_id = "counselor-1"
+    start_time = "2026-10-20T14:00:00+09:00"
+    client_email = "john@example.com"
+    
+    service.add_available_slot(counselor_id, start_time)
+    booking_id = service.create_booking(counselor_id, start_time, "John Doe", client_email)
+    
+    service.cancel_booking(booking_id, client_email)
+    
+    with pytest.raises(ValueError, match="Booking is already cancelled"):
+        service.cancel_booking(booking_id, client_email)

@@ -1,0 +1,196 @@
+{
+  "goals": [
+    "Implement a standalone Python library for a 1:1 counseling booking system with SQLite persistence.",
+    "Ensure strict state management for counseling slots and bookings to prevent double-booking.",
+    "Provide a defensive API that validates client identity via email for sensitive operations (lookup, cancellation).",
+    "Guarantee data integrity through atomic transactions and business invariant enforcement."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book an available slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Creation",
+      "steps": [
+        "Counselor provides counselor_id and start_time",
+        "System validates uniqueness of the slot",
+        "System persists the slot as AVAILABLE"
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client queries available slots (optional filter by counselor/date)",
+        "Client requests booking for a specific slot with name and email",
+        "System atomically checks availability and marks slot as BOOKED",
+        "System creates a CONFIRMED booking record with a UUID"
+      ]
+    },
+    {
+      "flow": "Booking Cancellation",
+      "steps": [
+        "Client provides booking_id and client_email",
+        "System verifies email matches the booking record",
+        "System transitions booking status to CANCELLED",
+        "System reverts the associated slot to AVAILABLE"
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Internal primary key",
+        "counselor_id": "String identifier",
+        "start_time": "ISO 8601 timestamp",
+        "is_booked": "Boolean flag"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "UUID string",
+        "slot_id": "Foreign key to Slot",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "Enum (CONFIRMED, CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": [
+        {
+          "from": "AVAILABLE",
+          "to": "BOOKED",
+          "trigger": "Create Booking",
+          "condition": "Slot must not be currently booked"
+        },
+        {
+          "from": "BOOKED",
+          "to": "AVAILABLE",
+          "trigger": "Cancel Booking",
+          "condition": "Associated booking must be transitioned to CANCELLED"
+        }
+      ]
+    },
+    {
+      "entity": "Booking",
+      "transitions": [
+        {
+          "from": "NONE",
+          "to": "CONFIRMED",
+          "trigger": "Create Booking",
+          "condition": "Slot availability confirmed"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLED",
+          "trigger": "Cancel Booking",
+          "condition": "Email verification successful"
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule": "Slot Uniqueness",
+      "description": "A counselor cannot have multiple slots starting at the exact same time. (Unique constraint on counselor_id + start_time)."
+    },
+    {
+      "rule": "Booking Atomicity",
+      "description": "The check for slot availability and the marking of the slot as booked must occur within a single atomic transaction to prevent race conditions (double-booking)."
+    },
+    {
+      "rule": "Identity Verification",
+      "description": "Lookup and Cancellation operations must require both booking_id and client_email; if the email does not match the record, the request must be rejected."
+    },
+    {
+      "rule": "Cancellation Idempotency",
+      "description": "Requesting cancellation for a booking that is already CANCELLED should be handled gracefully (e.g., return success or a specific 'already cancelled' state) without corrupting the slot status."
+    },
+    {
+      "rule": "Slot Recovery",
+      "description": "When a booking is cancelled, the linked slot must immediately return to AVAILABLE status."
+    }
+  ],
+  "ui_views": [
+    {
+      "interface": "CounselingService API",
+      "methods": [
+        "add_available_slot(counselor_id, start_time)",
+        "query_available_slots(counselor_id=None, date=None)",
+        "create_booking(counselor_id, start_time, client_name, client_email)",
+        "lookup_booking(booking_id, client_email)",
+        "cancel_booking(booking_id, client_email)"
+      ]
+    }
+  ],
+  "edge_cases": [
+    {
+      "scenario": "Concurrent Booking",
+      "assertion": "If two clients attempt to book the same slot simultaneously, only one must succeed; the other must receive a ValueError/DomainException."
+    },
+    {
+      "scenario": "Invalid Email Cancellation",
+      "assertion": "Attempting to cancel a booking with a valid booking_id but an incorrect email must raise an authentication/verification error."
+    },
+    {
+      "scenario": "Duplicate Slot Addition",
+      "assertion": "Adding a slot that already exists for a counselor should be rejected or handled as a no-op to maintain uniqueness."
+    },
+    {
+      "scenario": "Booking Non-existent Slot",
+      "assertion": "Attempting to book a slot that does not exist or is already booked must be rejected."
+    },
+    {
+      "scenario": "Cancellation of Cancelled Booking",
+      "assertion": "The slot must remain AVAILABLE and the booking status must remain CANCELLED without creating duplicate slots."
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "SQLite Transaction Level",
+      "rationale": "Use 'BEGIN IMMEDIATE' transactions for the booking process to lock the database and prevent write-collisions during the check-and-set phase."
+    },
+    {
+      "decision": "Timezone Handling",
+      "rationale": "Store timestamps as ISO 8601 strings. The service will assume Asia/Seoul as per the brief, but will rely on the offset provided in the string for persistence."
+    },
+    {
+      "decision": "Persistence Lifecycle",
+      "rationale": "The service class will manage its own connection. For test suites using ':memory:', a single connection will be maintained for the duration of the test to ensure data persists across method calls."
+    },
+    {
+      "decision": "UUID Generation",
+      "rationale": "Use the 'uuid' module to generate booking_ids to ensure global uniqueness and prevent predictable ID enumeration."
+    }
+  ],
+  "assumptions": [
+    "All counseling slots are exactly 30 minutes long.",
+    "The system does not need to handle slot modifications (e.g., changing the start time) after creation.",
+    "The client_email is the primary means of identity verification for this V1."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "invariant_checks": {
+      "slot_booking_consistency": "Invariant: count(Bookings where slot_id=X and status='CONFIRMED') <= 1",
+      "slot_status_sync": "Invariant: Slot.is_booked == True IFF exists Booking(slot_id=X, status='CONFIRMED')"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "run_id": "20261015T065024Z_track2_cond3_invariant_r001_165c852f",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond3_invariant",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "model_calls": 15,
+  "tool_calls": 14,
+  "input_tokens": 112903,
+  "output_tokens": 35421,
+  "total_tokens": 148324,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 15,
+  "ttft_ms": 13302.547,
+  "first_text_ms": null,
+  "generation_ms": 3274992.527,
+  "total_latency_ms": 3471738.279,
+  "generation_tokens_per_second": 10.816,
+  "tool_time_ms": 1055.168,
+  "agent_turn_ms": 3472832.136
+}

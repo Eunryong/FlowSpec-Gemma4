@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evaluation-result.schema.json",
+  "title": "Blind Evaluation Result",
+  "type": "object",
+  "required": [
+    "anonymous_id",
+    "functional_tests",
+    "edge_case_tests",
+    "regression_tests",
+    "future_change_tests",
+    "ui_usability_tests",
+    "static_complexity_metrics"
+  ],
+  "properties": {
+    "anonymous_id": { "type": "string" },
+    "functional_tests": { "type": "array" },
+    "edge_case_tests": { "type": "array" },
+    "regression_tests": { "type": "array" },
+    "future_change_tests": { "type": "array" },
+    "ui_usability_tests": { "type": "array" },
+    "static_complexity_metrics": { "type": "array" },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

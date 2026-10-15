@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "0.2",
+  "artifactType": "held_out_change_candidate_catalog",
+  "status": "DRAFT_CANDIDATES_NOT_FOR_INITIAL_PROMPT",
+  "releasePolicy": "Researcher keeps this file separate. A single change is revealed only after initial design is saved; these are candidates, not approved experimental stimuli.",
+  "candidates": [
+    {
+      "id": "CHG-CAND-01",
+      "dimension": "confirmation_policy",
+      "draftChange": "예약 제출 뒤 관리자가 승인해야 CONFIRMED로 바뀐다.",
+      "likelyAffectedCards": [
+        "FLOW-03",
+        "STATE-01",
+        "RULE-04",
+        "UI-04"
+      ],
+      "severity": "policy/cross-flow",
+      "approved": false
+    },
+    {
+      "id": "CHG-CAND-02",
+      "dimension": "resource_capacity",
+      "draftChange": "상담 서비스에 서로 다른 가용 시간을 가진 여러 상담자가 추가되고, 고객이 상담자를 선택할 수 있다.",
+      "likelyAffectedCards": [
+        "ACT-02",
+        "DOM-01",
+        "DOM-02",
+        "RULE-01",
+        "FLOW-01",
+        "FLOW-05"
+      ],
+      "severity": "domain/cross-module",
+      "approved": false
+    },
+    {
+      "id": "CHG-CAND-03",
+      "dimension": "cancellation_window",
+      "draftChange": "예약 시작 시각 전 특정 cutoff가 지난 뒤에는 고객이 직접 취소할 수 없다.",
+      "likelyAffectedCards": [
+        "FLOW-04",
+        "STATE-01",
+        "OPEN-02",
+        "UI-04"
+      ],
+      "severity": "policy/local-to-cross-flow",
+      "approved": false
+    },
+    {
+      "id": "CHG-CAND-04",
+      "dimension": "duplicate_submission",
+      "draftChange": "같은 예약 요청의 재전송은 중복 예약을 만들지 않고 기존 결과를 반환한다.",
+      "likelyAffectedCards": [
+        "EDGE-02",
+        "DOM-03",
+        "RULE-01",
+        "FLOW-02"
+      ],
+      "severity": "reliability/cross-flow",
+      "approved": false
+    }
+  ],
+  "antiLeakage": "이 파일, 후보 ID, affectedCardIds 및 gold test는 최초 설계 입력에 포함하지 않는다."
+}

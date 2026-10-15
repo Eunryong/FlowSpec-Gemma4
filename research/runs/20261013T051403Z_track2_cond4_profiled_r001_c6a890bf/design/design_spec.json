@@ -1,0 +1,161 @@
+{
+  "goals": [
+    "Provide a reliable 1:1 counseling booking system with SQLite persistence.",
+    "Ensure atomic booking operations to prevent double-booking of slots.",
+    "Implement a clean separation between business logic and data access.",
+    "Guarantee test isolation and reproducibility using configurable database paths."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available counseling slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Creation",
+      "steps": [
+        "Counselor provides counselor_id and start_time",
+        "System validates ISO 8601 format",
+        "System persists slot as available"
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client queries available slots (optional filter by counselor/date)",
+        "Client requests booking for a specific slot with name and email",
+        "System atomically verifies slot availability",
+        "System marks slot as booked and creates a CONFIRMED booking record",
+        "System returns a unique booking_id"
+      ]
+    },
+    {
+      "flow": "Booking Management",
+      "steps": [
+        "Client provides booking_id and email",
+        "System verifies email ownership",
+        "System returns booking details or processes cancellation",
+        "If cancelled, system updates booking status and reverts slot to available"
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Internal primary key",
+        "counselor_id": "String identifier",
+        "start_time": "ISO 8601 string (Asia/Seoul)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "UUID string",
+        "slot_id": "Foreign key to Slot",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "Enum (CONFIRMED, CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE",
+        "BOOKED"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is AVAILABLE.",
+    "Booking creation must be atomic: the slot must be marked BOOKED and the booking record created in a single transaction.",
+    "Booking lookup and cancellation require both booking_id and the matching client_email for verification.",
+    "Cancelling a booking must immediately transition the associated slot back to AVAILABLE.",
+    "Only one booking can exist per slot at any given time."
+  ],
+  "ui_views": [
+    {
+      "view": "API Interface",
+      "description": "The service is provided as a Python class `CounselingService` with methods for slot management and booking lifecycle."
+    }
+  ],
+  "edge_cases": [
+    "Concurrent booking requests for the same slot (Race condition).",
+    "Attempting to book a slot that was just cancelled by another user.",
+    "Providing a booking_id that exists but with a non-matching email.",
+    "Invalid ISO 8601 date strings provided during slot creation.",
+    "Querying slots for a date that has no slots defined."
+  ],
+  "design_decisions": [
+    {
+      "decision": "Repository Pattern",
+      "rationale": "Separate SQL execution (Repository) from business logic (Service) to satisfy P4 (Separation of Concerns) and facilitate easier testing/mocking.",
+      "rejected_alternatives": [
+        "Putting SQL directly in the service methods (leads to bloated, hard-to-test methods)."
+      ]
+    },
+    {
+      "decision": "SQLite Transaction Management",
+      "rationale": "Use 'BEGIN IMMEDIATE' transactions for the booking flow to prevent 'database is locked' errors and ensure atomicity (P1, P3, P5).",
+      "rejected_alternatives": [
+        "Standard 'BEGIN' which may allow read-locks to upgrade to write-locks, causing deadlocks in concurrent environments."
+      ]
+    },
+    {
+      "decision": "ISO 8601 String Storage",
+      "rationale": "Store start_time as strings to preserve the Asia/Seoul offset exactly as provided, avoiding timezone conversion errors during persistence (P5).",
+      "rejected_alternatives": [
+        "Converting to UTC timestamps (risks losing original offset context if not handled perfectly across all layers)."
+      ]
+    },
+    {
+      "decision": "Composite Unique Constraint",
+      "rationale": "Apply a UNIQUE constraint on (counselor_id, start_time) in the Slots table to prevent duplicate slot entries for the same time (P3).",
+      "rejected_alternatives": [
+        "Checking for existence via a SELECT query before INSERT (prone to race conditions)."
+      ]
+    },
+    {
+      "decision": "Dependency Injection for DB Path",
+      "rationale": "Allow `db_path` to be passed to the constructor to enable `:memory:` databases for pytest isolation (P1).",
+      "rejected_alternatives": [
+        "Hardcoded file path (prevents parallel test execution and leaves artifacts)."
+      ]
+    }
+  ],
+  "assumptions": [
+    "The system operates within a single timezone context (Asia/Seoul) as per the brief.",
+    "The `client_email` is treated as a unique identifier for a client's identity relative to a specific booking.",
+    "The 30-minute duration is a fixed property of the slot and does not need to be dynamically calculated or validated against other slots."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "traceability_map": {
+      "create_booking": "Service.create_booking -> Repository.get_slot -> Repository.update_slot_status -> Repository.insert_booking",
+      "cancel_booking": "Service.cancel_booking -> Repository.verify_booking_owner -> Repository.update_booking_status -> Repository.update_slot_status",
+      "exception_chain": "SlotUnavailableError (409) -> ValueError (400) -> BookingNotFoundError (404) -> UnauthorizedBookingError (403)"
+    }
+  }
+}

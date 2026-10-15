@@ -1,0 +1,23 @@
+{
+  "run_id": "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond4_flow",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 8,
+  "tool_calls": 6,
+  "input_tokens": 61397,
+  "output_tokens": 16576,
+  "total_tokens": 77973,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 8,
+  "ttft_ms": 16471.897,
+  "first_text_ms": 1683887.095,
+  "generation_ms": 1587235.571,
+  "total_latency_ms": 1697192.881,
+  "generation_tokens_per_second": 10.443,
+  "tool_time_ms": 376.545,
+  "agent_turn_ms": 1697591.614
+}

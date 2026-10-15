@@ -1,0 +1,116 @@
+{
+  "goals": [
+    "Provide a reliable 1:1 counseling booking system with persistent storage.",
+    "Ensure strict data integrity for slot availability and booking status.",
+    "Implement a verifiable booking lifecycle including creation, lookup, and cancellation.",
+    "Maintain a clean separation between the service logic and the SQLite storage layer."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    "Counselor adds a slot -> Client queries available slots -> Client books the slot -> Slot becomes unavailable.",
+    "Client provides booking ID and email -> System verifies identity -> System returns booking details.",
+    "Client provides booking ID and email -> System verifies identity -> System cancels booking -> Slot is marked as available again."
+  ],
+  "domain_entities": [
+    {
+      "name": "Slot",
+      "fields": {
+        "slot_id": "Integer (Primary Key)",
+        "counselor_id": "String",
+        "start_time": "String (ISO 8601)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "name": "Booking",
+      "fields": {
+        "booking_id": "String (UUID, Primary Key)",
+        "slot_id": "Integer (Foreign Key to Slot)",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "String (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "AVAILABLE (is_booked=False)",
+        "BOOKED (is_booked=True)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is AVAILABLE.",
+    "Booking creation must be atomic: the slot must be marked as BOOKED and the booking record created in one transaction.",
+    "Only the client with the matching email address can lookup or cancel a specific booking.",
+    "Cancelling a booking must immediately transition the associated slot back to AVAILABLE.",
+    "Counselors cannot have overlapping slots (unique constraint on counselor_id and start_time)."
+  ],
+  "ui_views": [
+    "API Interface: CounselingService class providing methods for slot and booking management."
+  ],
+  "edge_cases": [
+    "Attempting to book a slot that was just booked by another user (Race condition).",
+    "Providing an invalid ISO 8601 date string.",
+    "Attempting to cancel a booking that is already CANCELLED.",
+    "Attempting to lookup a booking with a valid ID but the wrong email."
+  ],
+  "design_decisions": [
+    "Use SQLite for lightweight, file-based persistence.",
+    "Use UUIDs for booking IDs to prevent predictable ID enumeration.",
+    "Store dates as ISO 8601 strings to maintain timezone offsets (Asia/Seoul).",
+    "Implement custom domain exceptions for clear error handling (e.g., SlotAlreadyBookedError)."
+  ],
+  "assumptions": [
+    "The system assumes all slots are exactly 30 minutes long.",
+    "The system assumes the client's email is the primary identifier for authentication."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "formal_contract": {
+      "data_models": {
+        "Slot": "dataclass(slot_id: int, counselor_id: str, start_time: str, is_booked: bool)",
+        "Booking": "dataclass(booking_id: str, slot_id: int, client_name: str, client_email: str, status: str)"
+      },
+      "service_interface": {
+        "class": "CounselingService",
+        "constructor": "CounselingService(db_path: str = 'counseling.sqlite3')",
+        "methods": [
+          {
+            "name": "add_available_slot",
+            "signature": "add_available_slot(counselor_id: str, start_time: str) -> None",
+            "exceptions": [
+              "ValueError (if slot already exists)"
+            ]
+          },
+          {
+            "name": "query_available_slots",
+            "signature": "query_available_slots(counselor_id: Optional[str] = None, date: Optional[str] = None) -> List[Slot]",
+            "description": "date filter expects 'YYYY-MM-DD'"
+          },
+          {

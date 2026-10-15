@@ -1,0 +1,151 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking engine with SQLite persistence.",
+    "Ensure strict session pass management with idempotency to prevent double-deduction or double-issuance.",
+    "Provide atomic booking operations, including rescheduling and cancellation with automatic waitlist promotion.",
+    "Maintain a verifiable system state through audit logs and a global reconciliation check."
+  ],
+  "actors": [
+    "Counselor: Manages availability and slots.",
+    "Client: Books sessions, manages session passes, and joins waitlists.",
+    "System: Handles automatic promotion, ledger updates, and reconciliation."
+  ],
+  "user_flows": [
+    "Counselor Registration -> Slot Creation -> Slot Blocking/Unblocking.",
+    "Client Pass Top-up (Idempotent) -> Booking Creation (Session Deduction) -> Session Confirmation.",
+    "Confirmed Booking -> Reschedule to New Slot (Atomic Swap) -> Updated Confirmation.",
+    "Confirmed Booking -> Cancellation -> Session Restoration -> Waitlist Auto-Promotion (FIFO).",
+    "System Audit -> Reconciliation Check (Balance Verification)."
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "fields": {
+        "counselor_id": "str (Primary Key)",
+        "name": "str",
+        "specialty": "str"
+      }
+    },
+    {
+      "entity": "Slot",
+      "fields": {
+        "slot_id": "str (Primary Key)",
+        "counselor_id": "str (Foreign Key)",
+        "start_time": "str (ISO 8601)",
+        "status": "SlotStatus (AVAILABLE | BOOKED | BLOCKED)"
+      }
+    },
+    {
+      "entity": "ClientPass",
+      "fields": {
+        "client_email": "str (Primary Key)",
+        "remaining_sessions": "int",
+        "used_sessions": "int"
+      }
+    },
+    {
+      "entity": "PassLedgerEntry",
+      "fields": {
+        "entry_id": "str (Primary Key)",
+        "client_email": "str (Foreign Key)",
+        "booking_id": "str | None",
+        "entry_type": "LedgerType (ISSUE | USE | RESTORE)",
+        "delta_sessions": "int",
+        "idempotency_key": "str (Unique)"
+      }
+    },
+    {
+      "entity": "Booking",
+      "fields": {
+        "booking_id": "str (Primary Key)",
+        "counselor_id": "str (Foreign Key)",
+        "start_time": "str",
+        "client_name": "str",
+        "client_email": "str (Foreign Key)",
+        "status": "BookingStatus (CONFIRMED | CANCELLED)",
+        "idempotency_key": "str | None"
+      }
+    },
+    {
+      "entity": "WaitlistEntry",
+      "fields": {
+        "waitlist_id": "str (Primary Key)",
+        "counselor_id": "str (Foreign Key)",
+        "start_time": "str",
+        "client_name": "str",
+        "client_email": "str (Foreign Key)",
+        "status": "WaitlistStatus (WAITING | PROMOTED)"
+      }
+    },
+    {
+      "entity": "AuditLogEntry",
+      "fields": {
+        "log_id": "str (Primary Key)",
+        "booking_id": "str (Foreign Key)",
+        "event_type": "str",
+        "from_status": "str | None",
+        "to_status": "str | None",
+        "timestamp": "str"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": "AVAILABLE -> BOOKED (via create_booking/promotion), AVAILABLE -> BLOCKED (via block_slot), BOOKED -> AVAILABLE (via cancel_booking if no waitlist), BLOCKED -> AVAILABLE (via unblock_slot)"
+    },
+    {
+      "entity": "Booking",
+      "transitions": "CONFIRMED -> CANCELLED (via cancel_booking)"
+    },
+    {
+      "entity": "WaitlistEntry",
+      "transitions": "WAITING -> PROMOTED (via cancel_booking of original holder)"
+    }
+  ],
+  "business_rules": [
+    "A slot cannot be booked or blocked if it is not currently AVAILABLE.",
+    "A client must have at least 1 remaining session to create a booking or join a waitlist.",
+    "Pass ledger updates must be idempotent based on the provided idempotency_key.",
+    "Waitlist promotion follows FIFO order; only the first eligible client (remaining_sessions >= 1) is promoted.",
+    "Rescheduling must be atomic: the new slot must be acquired before the old slot is released.",
+    "System Balance Invariant: total_issued = total_remaining + total_used; total_used = active_bookings = booked_slots."
+  ],
+  "ui_views": [
+    "Available Slots List: Filtered by counselor and date.",
+    "Client Pass Status: Current remaining and used sessions.",
+    "Booking Details: Current status and counselor/time info.",
+    "Booking Audit Trail: Chronological list of status changes.",
+    "System Health Dashboard: Reconciliation metrics (is_balanced)."
+  ],
+  "edge_cases": [
+    "Rescheduling a booking to a slot that was just booked by another client (must raise ValueError and rollback).",
+    "Cancelling a booking where the first waitlisted person has 0 sessions (must skip to the next eligible person).",
+    "Issuing a session pass with a duplicate idempotency key (must return current state without adding sessions).",
+    "Attempting to block a slot that is already BOOKED (must raise ValueError).",
+    "Cancelling a booking that is already CANCELLED (must raise ValueError)."
+  ],
+  "design_decisions": [
+    {
+      "decision": "Public Method Signatures",
+      "details": [
+        "register_counselor(counselor_id: str, name: str, specialty: str) -> None",
+        "add_slot(counselor_id: str, start_time: str) -> dict",
+        "block_slot(counselor_id: str, start_time: str) -> None",
+        "query_available_slots(counselor_id: str | None = None, date_prefix: str | None = None) -> list[dict]",
+        "issue_session_pass(client_email: str, sessions_to_add: int, idempotency_key: str) -> dict",
+        "get_session_pass(client_email: str) -> dict",
+        "create_booking(counselor_id: str, start_time: str, client_name: str, client_email: str, idempotency_key: str | None = None) -> dict",
+        "lookup_booking(booking_id: str, client_email: str) -> dict",
+        "reschedule_booking(booking_id: str, client_email: str, new_counselor_id: str, new_start_time: str) -> dict",
+        "join_waitlist(counselor_id: str, start_time: str, client_name: str, client_email: str) -> None",
+        "cancel_booking(booking_id: str, client_email: str) -> dict",
+        "get_booking_audit_log(booking_id: str) -> list[dict]",
+        "get_system_reconciliation() -> dict"
+      ]
+    },
+    {
+      "decision": "Database DDL",
+      "details": [
+        "CREATE TABLE counselors (counselor_id TEXT PRIMARY KEY, name TEXT NOT NULL, specialty TEXT);",
+        "CREATE TABLE slots (slot_id TEXT PRIMARY KEY, counselor_id TEXT, start_time TEXT, status TEXT, FOREIGN KEY(counselor_id) REFERENCES counselors(counselor_id

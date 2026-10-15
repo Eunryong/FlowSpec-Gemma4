@@ -1,0 +1,174 @@
+{
+  "goals": [
+    "Implement a transactional commerce engine coordinating inventory, payments, and promotions.",
+    "Ensure strict data integrity using a Saga pattern for order fulfillment with compensating transactions.",
+    "Maintain a double-entry ledger for all financial movements to ensure auditability and reconciliation.",
+    "Implement a robust state machine for order lifecycles (Reserved, Paid, Shipped, Cancelled, Failed).",
+    "Guarantee idempotency for financial transactions to prevent duplicate charges or deposits."
+  ],
+  "actors": [
+    {
+      "name": "Customer",
+      "description": "The entity initiating orders, managing a wallet, and utilizing coupons."
+    },
+    {
+      "name": "CommerceEngine",
+      "description": "The central orchestrator managing the interaction between the Warehouse, Wallet, Coupon, and Order subsystems."
+    },
+    {
+      "name": "System Administrator",
+      "description": "The entity responsible for registering products and creating promotional coupons."
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Successful Order Fulfillment",
+      "steps": [
+        "Admin registers products with initial stock.",
+        "Customer creates wallet and deposits funds.",
+        "Customer places order with items and optional coupon.",
+        "Engine reserves stock and increments coupon usage.",
+        "Engine debits wallet balance.",
+        "Order transitions to PAID.",
+        "Engine ships order, committing stock deduction.",
+        "Order transitions to SHIPPED."
+      ]
+    },
+    {
+      "flow": "Payment Failure Compensation",
+      "steps": [
+        "Customer places order.",
+        "Engine reserves stock and increments coupon usage.",
+        "Engine attempts to debit wallet but finds insufficient funds.",
+        "Engine triggers compensating transaction: releases reserved stock and decrements coupon usage.",
+        "Order transitions to FAILED_PAYMENT."
+      ]
+    },
+    {
+      "flow": "Order Cancellation and Refund",
+      "steps": [
+        "Customer cancels a PAID order.",
+        "Engine releases reserved stock back to available stock.",
+        "Engine credits the final total back to the customer wallet via ledger.",
+        "Engine decrements coupon usage if applicable.",
+        "Order transitions to CANCELLED."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Product",
+      "attributes": [
+        "sku",
+        "name",
+        "price_cents",
+        "available_stock",
+        "reserved_stock"
+      ]
+    },
+    {
+      "entity": "Wallet",
+      "attributes": [
+        "customer_id",
+        "balance_cents"
+      ]
+    },
+    {
+      "entity": "LedgerEntry",
+      "attributes": [
+        "entry_id",
+        "customer_id",
+        "order_id",
+        "entry_type (DEBIT/CREDIT)",
+        "amount_cents",
+        "idempotency_key"
+      ]
+    },
+    {
+      "entity": "Coupon",
+      "attributes": [
+        "code",
+        "discount_percent",
+        "max_uses",
+        "min_order_cents",
+        "current_uses"
+      ]
+    },
+    {
+      "entity": "Order",
+      "attributes": [
+        "order_id",
+        "customer_id",
+        "items (list of SKU/Qty)",
+        "subtotal_cents",
+        "discount_cents",
+        "final_total_cents",
+        "status",
+        "coupon_code"
+      ]
+    },
+    {
+      "entity": "AuditLog",
+      "attributes": [
+        "order_id",
+        "event_type",
+        "from_state",
+        "to_state",
+        "timestamp"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Order",
+      "states": [
+        "RESERVED: Stock and coupon quota held, payment pending.",
+        "PAID: Payment successfully debited from wallet.",
+        "SHIPPED: Goods left warehouse, reserved stock committed.",
+        "CANCELLED: Order voided, funds refunded, stock released.",
+        "FAILED_PAYMENT: Payment failed, stock and coupon quota released."
+      ]
+    }
+  ],
+  "business_rules": [
+    "Stock Invariant: available_stock and reserved_stock must never be negative.",
+    "Financial Invariant: Wallet balance must never drop below 0.",
+    "Atomic Reservation: If any item in an order cannot be reserved, no items in that order are reserved.",
+    "Coupon Quota: current_uses must be incremented on reservation and decremented on cancellation or payment failure.",
+    "Idempotency: Ledger entries with the same idempotency_key must not result in multiple balance changes.",
+    "State Transition: Orders can only be shipped if status is PAID.",
+    "State Transition: Orders can only be cancelled if status is RESERVED or PAID."
+  ],
+  "ui_views": [
+    {
+      "view": "Order Audit Log",
+      "description": "A chronological list of state transitions for a specific order."
+    },
+    {
+      "view": "System Reconciliation Report",
+      "description": "A summary comparing net captured funds (debits - credits) against the total value of active (PAID/SHIPPED) orders."
+    }
+  ],
+  "edge_cases": [
+    "Order containing multiple quantities of the same SKU.",
+    "Applying a coupon that reaches its max_uses exactly at the moment of checkout.",
+    "Attempting to ship an order that has already been cancelled.",
+    "Depositing funds using a previously used idempotency key.",
+    "Cancelling an order that was never paid (RESERVED state)."
+  ],
+  "design_decisions": [
+    "Use SQLite for persistence to leverage ACID transactions for atomic state updates.",
+    "Represent all currency in cents (integers) to avoid floating-point precision errors.",
+    "Implement the Order Saga as a series of sequential steps with a defined rollback path for the 'Payment' step.",
+    "Use a separate Ledger table for all wallet changes to ensure a permanent audit trail of financial movements."
+  ],
+  "assumptions": [
+    "The system operates in a single-process environment where SQLite's locking mechanisms are sufficient.",
+    "The 'idempotency_key' is provided by the caller for deposits and payments.",
+    "Coupon discounts are calculated using integer floor division."
+  ],
+  "unresolved_items": [
+    "Handling of partial order cancellations (not required by brief).",
+    "Integration with external shipping providers (out of scope)."
+  ]
+}

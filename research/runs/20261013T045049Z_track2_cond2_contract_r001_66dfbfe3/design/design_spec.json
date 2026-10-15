@@ -1,0 +1,165 @@
+{
+  "goals": [
+    "Provide a reliable 1:1 counseling booking system with persistence.",
+    "Ensure atomic booking operations to prevent double-booking.",
+    "Implement a secure lookup and cancellation mechanism based on email verification.",
+    "Maintain a clean separation between domain logic and storage."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Lookup their own booking",
+        "Cancel their own booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    "Counselor adds a slot -> Client queries slots -> Client books slot -> Booking confirmed.",
+    "Client provides booking ID and email -> System verifies and returns booking details.",
+    "Client provides booking ID and email -> System verifies -> Booking cancelled -> Slot becomes available again."
+  ],
+  "domain_entities": [
+    {
+      "name": "Slot",
+      "description": "A specific time window offered by a counselor.",
+      "fields": {
+        "id": "Integer (Primary Key)",
+        "counselor_id": "String",
+        "start_time": "String (ISO 8601)",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "name": "Booking",
+      "description": "A reservation made by a client for a specific slot.",
+      "fields": {
+        "booking_id": "String (UUID, Primary Key)",
+        "slot_id": "Integer (Foreign Key to Slot)",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "String (CONFIRMED | CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "states": [
+        "Available (is_booked=False)",
+        "Booked (is_booked=True)"
+      ]
+    },
+    {
+      "entity": "Booking",
+      "states": [
+        "CONFIRMED",
+        "CANCELLED"
+      ]
+    }
+  ],
+  "business_rules": [
+    "A slot can only be booked if its current state is 'Available'.",
+    "Booking creation must be atomic: marking the slot as booked and creating the booking record must happen in one transaction.",
+    "A booking can only be looked up or cancelled if the provided email matches the email stored in the booking record.",
+    "Cancelling a booking must automatically set the associated slot's state back to 'Available'.",
+    "Booking IDs must be unique UUIDs."
+  ],
+  "ui_views": [
+    "API: add_available_slot",
+    "API: query_available_slots",
+    "API: create_booking",
+    "API: lookup_booking",
+    "API: cancel_booking"
+  ],
+  "edge_cases": [
+    "Two clients attempting to book the same slot simultaneously (Race condition).",
+    "Client attempting to cancel a booking that is already cancelled.",
+    "Client attempting to lookup a booking with a valid ID but incorrect email.",
+    "Counselor adding a slot that already exists for the same time and counselor.",
+    "Invalid ISO 8601 date formats provided in requests."
+  ],
+  "design_decisions": [
+    "Use SQLite for lightweight, file-based persistence.",
+    "Use ISO 8601 strings for date-time storage to ensure timezone consistency (Asia/Seoul).",
+    "Implement a custom Exception hierarchy for domain-specific errors (e.g., SlotAlreadyBookedError).",
+    "Use a Service Layer pattern (`CounselingService`) to encapsulate all business logic."
+  ],
+  "assumptions": [
+    "All counseling slots are exactly 30 minutes long.",
+    "The system does not need to handle counselor schedules/conflicts beyond the existence of a slot.",
+    "Email is used as the primary verification token for clients."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "formal_contract": {
+      "data_models": {
+        "Slot": "dataclass(id: int, counselor_id: str, start_time: str, is_booked: bool)",
+        "Booking": "dataclass(booking_id: str, slot_id: int, client_name: str, client_email: str, status: str)"
+      },
+      "service_interface": {
+        "class": "CounselingService",
+        "constructor": "CounselingService(db_path: str = 'counseling.sqlite3')",
+        "methods": [
+          {
+            "name": "add_available_slot",
+            "signature": "add_available_slot(self, counselor_id: str, start_time: str) -> None",
+            "exceptions": [
+              "ValueError (if start_time is invalid ISO 8601)"
+            ]
+          },
+          {
+            "name": "query_available_slots",
+            "signature": "query_available_slots(self, counselor_id: Optional[str] = None, date: Optional[str] = None) -> List[Slot]",
+            "notes": "date filter should match 'YYYY-MM-DD' part of start_time"
+          },
+          {
+            "name": "create_booking",
+            "signature": "create_booking(self, counselor_id: str, start_time: str, client_name: str, client_email: str) -> str",
+            "return": "booking_id (UUID)",
+            "exceptions": [
+              "SlotNotFoundError",
+              "SlotAlreadyBookedError"
+            ]
+          },
+          {
+            "name": "lookup_booking",
+            "signature": "lookup_booking(self, booking_id: str, client_email: str) -> Booking",
+            "exceptions": [
+              "BookingNotFoundError",
+              "AuthenticationError (if email mismatch)"
+            ]
+          },
+          {
+            "name": "cancel_booking",
+            "signature": "cancel_booking(self, booking_id: str, client_email: str) -> None",
+            "exceptions": [
+              "BookingNotFoundError",
+              "AuthenticationError (if email mismatch)"
+            ]
+          }
+        ]
+      },
+      "database_ddl": [
+        "CREATE TABLE IF NOT EXISTS slots (id INTEGER PRIMARY KEY AUTOINCREMENT, counselor_id TEXT NOT NULL, start_time TEXT NOT NULL, is_booked INTEGER DEFAULT 0)",
+        "CREATE TABLE IF NOT EXISTS bookings (booking_id TEXT PRIMARY KEY, slot_id INTEGER NOT NULL, client_name TEXT NOT NULL, client_email TEXT NOT NULL, status TEXT NOT NULL, FOREIGN KEY(slot_id) REFERENCES slots(id))",
+        "CREATE INDEX IF NOT EXISTS idx_slots_counselor_time ON slots(counselor_id, start_time)",
+        "CREATE INDEX IF NOT EXISTS idx_bookings_email ON bookings(client_email)"
+      ],
+      "domain_exceptions": [
+        "SlotNotFoundError(Exception)",
+        "SlotAlreadyBookedError(Exception)",
+        "BookingNotFoundError(Exception)",
+        "AuthenticationError(Exception)"
+      ]
+    }
+  }
+}

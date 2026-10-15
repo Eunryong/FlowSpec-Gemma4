@@ -1,0 +1,504 @@
+{
+  "schemaVersion": "0.2",
+  "artifactType": "research_input_card_catalog",
+  "status": "DRAFT_NOT_READY_FOR_EXPERIMENT",
+  "domain": {
+    "id": "one_to_one_consultation_booking",
+    "label": "1:1 상담 예약 서비스",
+    "confirmed": true,
+    "complexity": "L2"
+  },
+  "readiness": {
+    "readyForRun": false,
+    "blockers": [
+      "카드 내용 사용자 검토 미완료",
+      "상담 분야와 상담자 운영 모델 미확정",
+      "v1 요구사항과 예시/미결정 사항 미분리"
+    ]
+  },
+  "cardSemantics": {
+    "origin": [
+      "USER_EXAMPLE_NOT_APPROVED",
+      "ASSISTANT_DRAFT",
+      "ASSISTANT_DRAFT_OPEN",
+      "ASSISTANT_PROPOSAL",
+      "OPEN"
+    ],
+    "reviewStatus": [
+      "UNREVIEWED",
+      "ACCEPTED",
+      "PROVISIONAL",
+      "REJECTED"
+    ],
+    "decisionClass": [
+      "STABLE",
+      "PROVISIONAL",
+      "ASSUMPTION",
+      "OPEN"
+    ],
+    "note": "Origin, reviewStatus, decisionClass는 별도 축이다. 사용자가 든 예시는 승인 요구사항이 아니다."
+  },
+  "agentVisibilityPolicy": {
+    "default": false,
+    "note": "이 catalog 전체를 그대로 Agent 초기 프롬프트에 넣지 않는다. 승인된 v1 brief만 추출해 전달하고, 미정/미래 변경 카드는 숨긴다."
+  },
+  "cards": [
+    {
+      "id": "PG-01",
+      "type": "Product Goal",
+      "statement": "고객이 상담자의 가능 시간을 확인하고 1:1 상담을 예약할 수 있다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "ACT-01",
+        "FLOW-01",
+        "FLOW-02"
+      ],
+      "validationCandidate": "고객이 가능 시간 탐색부터 예약 결과 확인까지 수행",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "ACT-01",
+      "type": "Actor / Role",
+      "statement": "고객은 서비스/시간을 확인하고 예약을 생성한다. 조회·취소 권한은 미정.",
+      "origin": "USER_EXAMPLE_PLUS_OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-01",
+        "FLOW-02",
+        "FLOW-04"
+      ],
+      "validationCandidate": "고객 역할과 예약번호/로그인 방식을 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "ACT-02",
+      "type": "Actor / Role",
+      "statement": "상담자는 자신의 예약 가능 시간을 제공·관리하고 배정된 상담 일정을 확인한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-05",
+        "DOM-02"
+      ],
+      "validationCandidate": "상담자가 직접 관리하는지 별도 운영자가 필요한지 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "FLOW-01",
+      "type": "User Flow",
+      "statement": "고객이 상담 분야/상담자와 날짜를 골라 가능한 상담 시간을 확인한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "PG-01",
+        "DOM-01",
+        "DOM-02",
+        "UI-01",
+        "UI-02"
+      ],
+      "validationCandidate": "열림/닫힘 시간대와 예약 상태가 결과에 반영",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "FLOW-02",
+      "type": "User Flow",
+      "statement": "고객이 시간대를 선택하고 필수 정보를 입력해 예약을 제출한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-02",
+        "DOM-03",
+        "RULE-01",
+        "RULE-02",
+        "UI-03"
+      ],
+      "validationCandidate": "성공 시 예약 한 건이 생성되어 슬롯과 연결",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "FLOW-03",
+      "type": "User Flow",
+      "statement": "제출 결과로 성공 또는 실패 상태를 고객에게 보여준다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-03",
+        "UI-04"
+      ],
+      "validationCandidate": "성공/실패 안내가 실제 예약 상태와 일치",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "FLOW-04",
+      "type": "User Flow",
+      "statement": "고객이 기존 예약을 조회하고 허용 조건에서 취소한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-03",
+        "EDGE-04",
+        "DEC-01"
+      ],
+      "validationCandidate": "조회·취소 중 v1에 포함할 범위를 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "FLOW-05",
+      "type": "User Flow",
+      "statement": "상담자가 상담 가능 시간을 등록·닫거나 예약 일정을 확인한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "ACT-02",
+        "DOM-02",
+        "RULE-03"
+      ],
+      "validationCandidate": "기예약이 있는 슬롯을 닫을 때의 처리를 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "DOM-01",
+      "type": "Domain / State",
+      "statement": "ConsultationType은 상담 유형의 식별자와 표시 정보를 가진다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-01",
+        "DOM-02"
+      ],
+      "validationCandidate": "서비스별 소요시간/가격/담당 자원 필요성 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "DOM-02",
+      "type": "Domain / State",
+      "statement": "상담 시간대는 상담자, 시작·종료 시각, 예약 가능 여부를 연결한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-01",
+        "FLOW-02",
+        "RULE-01",
+        "RULE-03"
+      ],
+      "validationCandidate": "시간대를 사전 생성할지 규칙으로 계산할지 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "DOM-03",
+      "type": "Domain / State",
+      "statement": "Reservation은 고객 1명, 상담자 1명, 선택 시간대, 식별자와 현재 상태를 연결한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-02",
+        "FLOW-03",
+        "FLOW-04",
+        "STATE-01"
+      ],
+      "validationCandidate": "예약을 고객·슬롯·상태와 함께 재조회",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "STATE-01",
+      "type": "Domain / State",
+      "statement": "예시 상태는 CONFIRMED/CANCELLED. 별도 운영자 승인 방식이면 PENDING 필요 여부를 정한다.",
+      "origin": "USER_EXAMPLE_PLUS_OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-03",
+        "FLOW-03",
+        "FLOW-04",
+        "RULE-04"
+      ],
+      "validationCandidate": "허용 상태와 상태 전이를 표로 검증",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "RULE-01",
+      "type": "Business Rule",
+      "statement": "같은 상담자의 같은 시간대에는 활성 예약을 하나만 허용한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-02",
+        "DOM-03",
+        "FLOW-02",
+        "EDGE-01"
+      ],
+      "validationCandidate": "동일 상담자/시간대에 동시 예약을 두 건 요청하면 성공은 최대 하나",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "RULE-02",
+      "type": "Business Rule",
+      "statement": "제출 시점에 해당 상담자의 시간 가능 여부를 재검증하고 슬롯을 확보한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-02",
+        "RULE-01",
+        "EDGE-01"
+      ],
+      "validationCandidate": "조회 이후 선점된 슬롯 제출이 거절됨",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "RULE-03",
+      "type": "Business Rule",
+      "statement": "상담자가 닫았거나 운영 불가로 표시된 시간에는 새 상담 예약을 받지 않는다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "ACT-02",
+        "FLOW-05",
+        "DOM-02",
+        "UI-02"
+      ],
+      "validationCandidate": "닫힌 슬롯은 표시/직접 제출 모두에서 제외",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "RULE-04",
+      "type": "Business Rule",
+      "statement": "유효한 요청과 슬롯 확보에 성공하면 즉시 CONFIRMED로 전이하는 안이다. 별도 운영자 승인 여부는 미정이다.",
+      "origin": "ASSISTANT_DRAFT_OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "STATE-01",
+        "FLOW-03",
+        "UI-04"
+      ],
+      "validationCandidate": "즉시 확정 또는 관리자 승인 중 정책 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "UI-01",
+      "type": "UI / Interaction",
+      "statement": "고객이 상담 분야/상담자와 날짜를 선택해 가능 시간 조회를 시작한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-01",
+        "DOM-01"
+      ],
+      "validationCandidate": "서비스/날짜 변경 시 결과 목록도 갱신",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "UI-02",
+      "type": "UI / Interaction",
+      "statement": "예약 가능한 시간만 선택 가능하며 불가능한 시간은 상태를 구분해 표시한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-01",
+        "FLOW-02",
+        "RULE-03"
+      ],
+      "validationCandidate": "비활성 슬롯의 직접 제출도 거부",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "UI-03",
+      "type": "UI / Interaction",
+      "statement": "고객이 예약자 정보를 입력하고 제출 전 오류를 확인한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-02",
+        "EDGE-03"
+      ],
+      "validationCandidate": "필수 고객 정보와 필드 검증 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "UI-04",
+      "type": "UI / Interaction",
+      "statement": "성공·슬롯 충돌·입력 오류를 구별해 결과를 안내한다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-03",
+        "RULE-02",
+        "EDGE-01",
+        "EDGE-03"
+      ],
+      "validationCandidate": "실패를 성공처럼 보이지 않게 하고 재시도 가능성을 안내",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "EDGE-01",
+      "type": "Failure / Edge Case",
+      "statement": "조회 뒤 제출 전에 다른 요청이 먼저 같은 슬롯을 예약한다.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "RULE-01",
+        "RULE-02",
+        "UI-04"
+      ],
+      "validationCandidate": "두 제출 중 하나만 성공하고 최신 상태 안내",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "EDGE-02",
+      "type": "Failure / Edge Case",
+      "statement": "더블 클릭 또는 응답 유실 후 재시도로 중복 제출이 발생할 수 있다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-02",
+        "DOM-03",
+        "RULE-01"
+      ],
+      "validationCandidate": "idempotency를 v1 요구인지 후속 변경인지 결정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "EDGE-03",
+      "type": "Failure / Edge Case",
+      "statement": "예약자 정보 누락/형식 오류가 있을 수 있다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-02",
+        "UI-03",
+        "UI-04"
+      ],
+      "validationCandidate": "오류 입력은 저장되지 않고 수정 가능한 오류 반환",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "EDGE-04",
+      "type": "Failure / Edge Case",
+      "statement": "잘못된 예약번호 또는 이미 취소된 예약에 조회/취소 요청이 온다.",
+      "origin": "ASSISTANT_DRAFT",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-04",
+        "DOM-03",
+        "STATE-01"
+      ],
+      "validationCandidate": "없는 예약과 이미 취소된 예약 응답 정책 확인",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "DEC-01",
+      "type": "Assumption / Decision",
+      "statement": "로그인 없이 예약번호를 발급해 조회하는 안.",
+      "origin": "USER_EXAMPLE_NOT_APPROVED",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-04",
+        "DOM-03"
+      ],
+      "validationCandidate": "개인정보 접근 보호 방식 검토",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "OPEN-01",
+      "type": "Assumption / Decision",
+      "statement": "상담자가 한 명인지 여러 명인지, 고객이 상담자를 선택하는지 운영자가 배정하는지 미정이다.",
+      "origin": "OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-01",
+        "DOM-02",
+        "RULE-01",
+        "FLOW-05"
+      ],
+      "validationCandidate": "단일/다중 상담자와 선택/배정 방식을 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "OPEN-02",
+      "type": "Assumption / Decision",
+      "statement": "고객 취소·재예약 허용 시점과 제약이 미정.",
+      "origin": "OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "FLOW-04",
+        "STATE-01"
+      ],
+      "validationCandidate": "취소 cutoff와 재예약 범위 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "OPEN-03",
+      "type": "Assumption / Decision",
+      "statement": "영업 가능 구간에서 상담 시간대를 고정 간격으로 생성하는지, 상담자/운영자가 개별 시간대를 입력하는지 미정이다.",
+      "origin": "OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-01",
+        "DOM-02",
+        "FLOW-01",
+        "FLOW-05",
+        "RULE-03"
+      ],
+      "validationCandidate": "서비스 길이와 영업 가능 시간대 적용 방식 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "OPEN-04",
+      "type": "Assumption / Decision",
+      "statement": "저장·표시에 서비스 현지 시간 또는 UTC 중 어떤 기준을 쓸지 미정.",
+      "origin": "OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "DOM-02",
+        "FLOW-01",
+        "RULE-03"
+      ],
+      "validationCandidate": "시간대/일광절약시간 범위를 확정",
+      "agentVisibleInitially": false
+    },
+    {
+      "id": "OPEN-05",
+      "type": "Assumption / Decision",
+      "statement": "상담 분야와 예약 시 수집할 정보(연락처만인지, 상담 주제/메모도 포함하는지)가 미정이다.",
+      "origin": "OPEN",
+      "reviewStatus": "UNREVIEWED",
+      "decisionClass": null,
+      "linkedIds": [
+        "ACT-01",
+        "FLOW-02",
+        "DOM-03",
+        "UI-03"
+      ],
+      "validationCandidate": "상담 내용/민감한 세션 기록을 예약 시스템에 저장할 필요가 있는지 결정",
+      "agentVisibleInitially": false
+    }
+  ]
+}

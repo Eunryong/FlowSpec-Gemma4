@@ -1,0 +1,184 @@
+{
+  "goals": [
+    "Provide a standalone Python library for managing 1:1 counseling bookings.",
+    "Ensure strict data integrity and prevent double-booking of time slots.",
+    "Implement a persistent storage layer using SQLite.",
+    "Enable a secure booking lifecycle including creation, verification, and cancellation."
+  ],
+  "actors": [
+    {
+      "role": "Counselor",
+      "capabilities": [
+        "Create available time slots"
+      ]
+    },
+    {
+      "role": "Client",
+      "capabilities": [
+        "Query available slots",
+        "Book a slot",
+        "Verify booking details",
+        "Cancel a booking"
+      ]
+    }
+  ],
+  "user_flows": [
+    {
+      "flow": "Slot Provisioning",
+      "steps": [
+        "Counselor specifies counselor_id and start_time",
+        "System validates time format and checks for existing slots",
+        "System persists the available slot"
+      ]
+    },
+    {
+      "flow": "Booking Process",
+      "steps": [
+        "Client queries available slots (optional filter by counselor/date)",
+        "Client requests booking for a specific slot with name and email",
+        "System atomically verifies slot availability and marks it as booked",
+        "System generates a UUID booking_id and returns it to the client"
+      ]
+    },
+    {
+      "flow": "Booking Management",
+      "steps": [
+        "Client provides booking_id and email for lookup",
+        "System verifies email match and returns booking details",
+        "Client requests cancellation using booking_id and email",
+        "System verifies email, updates booking status to CANCELLED, and reverts slot to AVAILABLE"
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Slot",
+      "attributes": {
+        "slot_id": "Internal Primary Key",
+        "counselor_id": "String",
+        "start_time": "ISO 8601 String",
+        "is_booked": "Boolean"
+      }
+    },
+    {
+      "entity": "Booking",
+      "attributes": {
+        "booking_id": "UUID String",
+        "slot_id": "Foreign Key to Slot",
+        "client_name": "String",
+        "client_email": "String",
+        "status": "Enum (CONFIRMED, CANCELLED)"
+      }
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": [
+        {
+          "from": "AVAILABLE",
+          "to": "BOOKED",
+          "trigger": "create_booking"
+        },
+        {
+          "from": "BOOKED",
+          "to": "AVAILABLE",
+          "trigger": "cancel_booking"
+        }
+      ]
+    },
+    {
+      "entity": "Booking",
+      "transitions": [
+        {
+          "from": "CONFIRMED",
+          "to": "CANCELLED",
+          "trigger": "cancel_booking"
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule": "Slot Uniqueness",
+      "description": "A counselor cannot have more than one slot starting at the exact same time."
+    },
+    {
+      "rule": "Booking Atomicity",
+      "description": "The check for slot availability and the marking of the slot as booked must occur within a single database transaction to prevent race conditions (double-booking)."
+    },
+    {
+      "rule": "Booking Verification",
+      "description": "Lookup and Cancellation operations must require both the booking_id and the client_email to ensure the requester is the owner of the booking."
+    },
+    {
+      "rule": "Slot Recovery",
+      "description": "When a booking is transitioned to CANCELLED, the associated slot must immediately return to AVAILABLE status."
+    }
+  ],
+  "ui_views": [
+    {
+      "interface": "CounselingService API",
+      "methods": [
+        "add_available_slot(counselor_id, start_time)",
+        "query_available_slots(counselor_id=None, date=None)",
+        "create_booking(counselor_id, start_time, client_name, client_email)",
+        "lookup_booking(booking_id, client_email)",
+        "cancel_booking(booking_id, client_email)"
+      ]
+    }
+  ],
+  "edge_cases": [
+    {
+      "scenario": "Concurrent Booking Requests",
+      "assertion": "Only one request succeeds; the second request must raise a ValueError/DomainException indicating the slot is no longer available."
+    },
+    {
+      "scenario": "Duplicate Cancellation",
+      "assertion": "Requesting cancellation for an already CANCELLED booking should be handled idempotently or return a specific error, without affecting slot availability."
+    },
+    {
+      "scenario": "Email Mismatch",
+      "assertion": "Providing a valid booking_id but an incorrect client_email must result in a rejection (e.g., PermissionError or ValueError)."
+    },
+    {
+      "scenario": "Non-existent Slot Booking",
+      "assertion": "Attempting to book a counselor_id/start_time combination that was never created must be rejected."
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "SQLite Transaction Isolation",
+      "rationale": "Use 'BEGIN IMMEDIATE' or similar transaction locking to ensure that the read-then-write sequence for booking a slot is atomic."
+    },
+    {
+      "decision": "UUID for Booking IDs",
+      "rationale": "Prevents booking ID enumeration and ensures uniqueness across potential distributed environments."
+    },
+    {
+      "decision": "ISO 8601 for Time",
+      "rationale": "Ensures timezone consistency (Asia/Seoul) and standardizes date-time arithmetic."
+    },
+    {
+      "decision": "In-memory SQLite for Tests",
+      "rationale": "Allows for fast, isolated test execution without leaving filesystem artifacts."
+    }
+  ],
+  "assumptions": [
+    "All counseling slots are exactly 30 minutes long.",
+    "The system operates primarily in the Asia/Seoul timezone.",
+    "The `client_email` serves as the primary identity verification for clients."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "defensive_invariant_blueprint": {
+      "integrity_constraints": [
+        "UNIQUE(counselor_id, start_time) on slots table",
+        "FOREIGN KEY(slot_id) REFERENCES slots(id) on bookings table",
+        "CHECK(status IN ('CONFIRMED', 'CANCELLED')) on bookings table"
+      ],
+      "concurrency_boundary": "The critical section is the transition from Slot.AVAILABLE to Slot.BOOKED. This must be wrapped in a database transaction to prevent the 'lost update' or 'phantom read' problem.",
+      "persistence_lifecycle": "The service will manage a single connection per instance or use a connection pool to ensure that transaction state is maintained correctly during a single operation."
+    }
+  }
+}

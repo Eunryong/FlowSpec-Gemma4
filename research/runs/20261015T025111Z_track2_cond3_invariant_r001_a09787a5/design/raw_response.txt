@@ -1,0 +1,126 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking engine with SQLite persistence.",
+    "Ensure strict session pass conservation and idempotency for all quota changes.",
+    "Provide atomic rescheduling and automatic waitlist promotion logic.",
+    "Maintain a global system reconciliation state to verify data integrity."
+  ],
+  "actors": [
+    "Client (Books, cancels, reschedules, manages passes)",
+    "Counselor (Provides availability, blocks slots)",
+    "System (Handles auto-promotion, audit logging, and reconciliation)"
+  ],
+  "user_flows": [
+    "Counselor registers and adds available slots.",
+    "Client tops up session pass using an idempotency key.",
+    "Client books an available slot (deducts session).",
+    "Client reschedules a booking to a new available slot (atomic swap).",
+    "Client cancels a booking (restores session, triggers waitlist promotion).",
+    "Waitlisted client is automatically promoted to a confirmed booking if sessions are available."
+  ],
+  "domain_entities": [
+    {
+      "name": "Counselor",
+      "attributes": ["counselor_id", "name", "specialty"]
+    },
+    {
+      "name": "Slot",
+      "attributes": ["slot_id", "counselor_id", "start_time", "status"]
+    },
+    {
+      "name": "SessionPass",
+      "attributes": ["client_email", "remaining_sessions", "used_sessions"]
+    },
+    {
+      "name": "PassLedger",
+      "attributes": ["entry_id", "client_email", "booking_id", "entry_type", "delta_sessions", "idempotency_key"]
+    },
+    {
+      "name": "Booking",
+      "attributes": ["booking_id", "counselor_id", "start_time", "client_name", "client_email", "status", "idempotency_key"]
+    },
+    {
+      "name": "Waitlist",
+      "attributes": ["waitlist_id", "counselor_id", "start_time", "client_name", "client_email", "status"]
+    },
+    {
+      "name": "AuditLog",
+      "attributes": ["log_id", "booking_id", "event_type", "from_status", "to_status", "timestamp"]
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": {
+        "AVAILABLE": ["BOOKED", "BLOCKED"],
+        "BOOKED": ["AVAILABLE", "BOOKED"],
+        "BLOCKED": ["AVAILABLE"]
+      },
+      "forbidden": ["BOOKED -> BLOCKED", "BLOCKED -> BOOKED"]
+    },
+    {
+      "entity": "Booking",
+      "transitions": {
+        "CONFIRMED": ["CANCELLED"]
+      },
+      "terminal": ["CANCELLED"]
+    },
+    {
+      "entity": "Waitlist",
+      "transitions": {
+        "WAITING": ["PROMOTED"]
+      },
+      "terminal": ["PROMOTED"]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule": "Session Conservation Invariant",
+      "description": "Total Issued Sessions = Total Remaining Sessions + Total Used Sessions."
+    },
+    {
+      "rule": "Booking-Slot Sync Invariant",
+      "description": "Count of CONFIRMED bookings must equal Count of BOOKED slots."
+    },
+    {
+      "rule": "Pass Non-negativity",
+      "description": "remaining_sessions must never be < 0."
+    },
+    {
+      "rule": "Idempotency Guarantee",
+      "description": "PassLedger.idempotency_key must be unique; duplicate keys must not trigger duplicate session changes."
+    },
+    {
+      "rule": "Atomic Rescheduling",
+      "description": "Rescheduling must be a single transaction: release old slot (trigger waitlist) and occupy new slot. If new slot is unavailable, rollback all changes."
+    },
+    {
+      "rule": "Waitlist FIFO Promotion",
+      "description": "Promotion occurs in order of registration; only the first client with remaining_sessions >= 1 is promoted."
+    }
+  ],
+  "ui_views": [],
+  "edge_cases": [
+    "Booking attempt with exactly 0 sessions remaining.",
+    "Rescheduling into a slot that was just blocked by the counselor.",
+    "Cancellation of a booking where the first waitlisted person has 0 sessions, but the second person has 1.",
+    "Concurrent booking requests for the same slot (handled by SQLite transaction isolation).",
+    "Idempotent pass top-up request sent multiple times."
+  ],
+  "design_decisions": [
+    "Use a single persistent sqlite3.Connection instance to ensure :memory: tables persist across method calls.",
+    "Wrap all multi-table mutations (Booking, Pass, Slot) in 'BEGIN TRANSACTION' and 'COMMIT' to ensure atomicity.",
+    "Use UUIDs for booking_id to prevent predictable ID enumeration.",
+    "Implement a 'System Reconciliation' method that aggregates ledger and state counts to verify invariants."
+  ],
+  "assumptions": [
+    "All timestamps are provided in ISO 8601 format.",
+    "The system operates in a single-process environment or relies on SQLite's file-level locking for concurrency.",
+    "Client email is the primary identifier for session passes."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "rollback_strategy": "Standard SQL ROLLBACK on ValueError or IntegrityError during atomic blocks.",
+    "integrity_checks": "get_system_reconciliation() must return is_balanced=True if all invariants hold."
+  }
+}

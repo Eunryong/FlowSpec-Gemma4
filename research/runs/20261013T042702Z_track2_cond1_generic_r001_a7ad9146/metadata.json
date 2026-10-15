@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "run_id": "20261013T042702Z_track2_cond1_generic_r001_a7ad9146",
+  "task_id": "brief_v1",
+  "timestamp": "2026-10-13T04:27:02.926999+00:00",
+  "track": "track2",
+  "condition": "cond1_generic",
+  "repetition_index": 1,
+  "repetitions": 1,
+  "model_identifier": "local-model",
+  "model_server_configuration": {
+    "base_url": "http://127.0.0.1:8080/v1",
+    "descriptor": null
+  },
+  "model_configuration": {
+    "temperature": 0.2,
+    "seed": null,
+    "context_length": 12288,
+    "max_output_tokens": 3584,
+    "timeout_seconds": 300.0,
+    "max_agent_steps": 40
+  },
+  "brief_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/briefs/brief_v1.md",
+    "snapshot": "inputs/brief.md",
+    "sha256": "fbac4b21058484dcc7757d5e73ec3c7d03e6e0412ebd00b37b46cdac7518f8cf"
+  },
+  "condition_file": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/conditions/track2/cond1_generic.md",
+    "snapshot": "inputs/condition.md",
+    "sha256": "b7d36aeb0dd86f9fcb7537321fb5b1821cc689a749c8e1457459dc016b8566ee"
+  },
+  "design_schema": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/schemas/design-specification.schema.json",
+    "snapshot": "inputs/design-schema.json",
+    "sha256": "57d692c197247c0ce0041571e00817f153c32438e10fa806f2130909642cc5e3"
+  },
+  "harness_prompts": {
+    "designer": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/designer-common.md",
+      "sha256": "2a4ee14039f84eb600b9dfe575a7fff91997b15de7d0d6a9cf98a9031898405d"
+    },
+    "coder": {
+      "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/prompts/coder-common.md",
+      "sha256": "6bc68c5cc57e5f6a78d81380bf34817b23771717b2298ec33e9c393d633a09a4"
+    }
+  },
+  "design_output_sha256": "0f41e88003c2bcf08b21a9b5f35d00109afb2a73199a197340de662c7b2612d4",
+  "implementation_workspace": {
+    "path": "/Users/eunryong/develop/tools/gemma-agent-worker/research/runs/20261013T042702Z_track2_cond1_generic_r001_a7ad9146/implementation",
+    "sha256": "bae3474fe8c958e2d2c422a0b864f00b7bef7c13d3b47148ee9cb3f479b33b78",
+    "source": null
+  },
+  "git_commit": null,
+  "design_status": "valid",
+  "implementation_status": "failed",
+  "run_status": "failed",
+  "revisions": [],
+  "metrics_files": {
+    "design": "metrics/design.json",
+    "implementation": "metrics/implementation.json"
+  }
+}

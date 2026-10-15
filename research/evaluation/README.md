@@ -1,0 +1,1 @@
+Evaluation results use result.schema.json and remain separate from run metadata. Use the blind-export command to create condition-free evaluation packages; the alias mapping is stored under hidden/evaluation-maps.

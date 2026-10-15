@@ -1,0 +1,22 @@
+{
+  "run_id": "20261013T041950Z_track2_cond4_profiled_r001_fa0692ed",
+  "task_id": "brief_v1",
+  "condition": "cond4_profiled",
+  "stage": "design",
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1409,
+  "output_tokens": 2048,
+  "total_tokens": 3457,
+  "token_usage_complete": true,
+  "ttft_ms": 3647.333,
+  "first_text_ms": 83210.338,
+  "prefill_ms": 3270.295,
+  "generation_ms": 165437.687,
+  "total_latency_ms": 169085.02,
+  "generation_tokens_per_second": 12.379,
+  "tool_time_ms": 0,
+  "agent_turn_ms": 169097.525
+}

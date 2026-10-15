@@ -1,0 +1,23 @@
+{
+  "run_id": "20261014T142644Z_track2_cond3_invariant_r001_41f6db1b",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond3_invariant",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 7,
+  "tool_calls": 5,
+  "input_tokens": 41439,
+  "output_tokens": 19854,
+  "total_tokens": 61293,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 7,
+  "ttft_ms": 28062.286,
+  "first_text_ms": 1676059.768,
+  "generation_ms": 1650448.609,
+  "total_latency_ms": 1697595.631,
+  "generation_tokens_per_second": 12.029,
+  "tool_time_ms": 233.307,
+  "agent_turn_ms": 1697849.009
+}

@@ -1,0 +1,124 @@
+{
+  "goals": [
+    "Implement a transactional 1:1 counseling booking engine with SQLite persistence.",
+    "Ensure session pass integrity via an idempotent ledger.",
+    "Manage slot lifecycles (AVAILABLE, BOOKED, BLOCKED).",
+    "Implement atomic rescheduling and FIFO waitlist auto-promotion."
+  ],
+  "actors": [
+    "Counselor",
+    "Client",
+    "System Administrator"
+  ],
+  "user_flows": [
+    {
+      "flow": "issue_session_pass",
+      "steps": [
+        "- Transaction: Insert 'ISSUE' entry into pass_ledger; Update/Insert session_passes (remaining_sessions += delta).",
+        "- Validate sessions_to_add > 0 and client_email non-empty.",
+        "- Return updated pass status.",
+        "- Check if idempotency_key exists in pass_ledger; if yes, return current pass status."
+      ]
+    },
+    {
+      "flow": "create_booking",
+      "steps": [
+        "- Verify slot exists and status == 'AVAILABLE'.",
+        "- Verify client remaining_sessions >= 1.",
+        "- Transaction: Update slot to 'BOOKED'; Update session_passes (remaining -= 1, used += 1); Insert 'USE' entry in pass_ledger; Insert booking (status='CONFIRMED'); Insert audit log 'BOOKING_CREATED'.",
+        "- Return booking dict.",
+        "- If idempotency_key exists in bookings, return existing booking."
+      ]
+    },
+    {
+      "flow": "reschedule_booking",
+      "steps": [
+        "- Transaction: Update old slot to 'AVAILABLE' (or trigger waitlist promotion); Update target slot to 'BOOKED'; Update booking (counselor_id, start_time); Insert audit log 'BOOKING_RESCHEDULED'.",
+        "- Verify target slot exists and status == 'AVAILABLE'.",
+        "- Verify booking exists, email matches, and status == 'CONFIRMED'.",
+        "- Return updated booking dict."
+      ]
+    },
+    {
+      "flow": "cancel_booking",
+      "steps": [
+        "- Transaction: Update booking to 'CANCELLED'; Update session_passes (remaining += 1, used -= 1); Insert 'RESTORE' entry in pass_ledger; Insert audit log 'BOOKING_CANCELLED'.",
+        "- If found: Update waitlist to 'PROMOTED'; Update session_passes (remaining -= 1, used += 1); Insert 'USE' entry in pass_ledger; Insert new 'CONFIRMED' booking; Insert audit log 'WAITLIST_PROMOTED'; Keep slot 'BOOKED'.",
+        "- Verify booking exists, email matches, and status == 'CONFIRMED'.",
+        "- Waitlist Check: Query FIFO 'WAITING' entries for slot. Find first with remaining_sessions >= 1.",
+        "- Return cancelled booking dict.",
+        "- If not found: Update slot to 'AVAILABLE'."
+      ]
+    }
+  ],
+  "domain_entities": [
+    {
+      "entity": "Counselor",
+      "schema": "CREATE TABLE counselors (counselor_id TEXT PRIMARY KEY, name TEXT, specialty TEXT)"
+    },
+    {
+      "entity": "Slot",
+      "schema": "CREATE TABLE slots (slot_id TEXT PRIMARY KEY, counselor_id TEXT, start_time TEXT, status TEXT)"
+    },
+    {
+      "entity": "SessionPass",
+      "schema": "CREATE TABLE session_passes (client_email TEXT PRIMARY KEY, remaining_sessions INTEGER, used_sessions INTEGER)"
+    },
+    {
+      "entity": "PassLedger",
+      "schema": "CREATE TABLE pass_ledger (entry_id INTEGER PRIMARY KEY, client_email TEXT, booking_id TEXT, entry_type TEXT, delta_sessions INTEGER, idempotency_key TEXT UNIQUE)"
+    },
+    {
+      "entity": "Booking",
+      "schema": "CREATE TABLE bookings (booking_id TEXT PRIMARY KEY, counselor_id TEXT, start_time TEXT, client_name TEXT, client_email TEXT, status TEXT, idempotency_key TEXT)"
+    },
+    {
+      "entity": "Waitlist",
+      "schema": "CREATE TABLE waitlist (waitlist_id INTEGER PRIMARY KEY, counselor_id TEXT, start_time TEXT, client_name TEXT, client_email TEXT, status TEXT)"
+    },
+    {
+      "entity": "AuditLog",
+      "schema": "CREATE TABLE audit_logs (log_id INTEGER PRIMARY KEY, booking_id TEXT, event_type TEXT, from_status TEXT, to_status TEXT, timestamp DATETIME)"
+    }
+  ],
+  "states": [
+    {
+      "entity": "Slot",
+      "transitions": "AVAILABLE -> BOOKED, AVAILABLE -> BLOCKED, BOOKED -> AVAILABLE, BOOKED -> BOOKED (via promotion)"
+    },
+    {
+      "entity": "Booking",
+      "transitions": "CONFIRMED -> CANCELLED"
+    },
+    {
+      "entity": "Waitlist",
+      "transitions": "WAITING -> PROMOTED"
+    }
+  ],
+  "business_rules": [
+    "Session conservation: total_issued = total_remaining + total_used.",
+    "Slot exclusivity: Only one CONFIRMED booking per slot.",
+    "Waitlist eligibility: Client must have >= 1 session to join or be promoted.",
+    "Idempotency: Duplicate keys for pass issuance or booking creation must not mutate state."
+  ],
+  "ui_views": [],
+  "edge_cases": [
+    "Rescheduling into a slot that was just blocked.",
+    "Cancellation where the only waitlisted person has 0 sessions.",
+    "Concurrent booking attempts on the same slot (handled by SQLite transaction).",
+    "Issuing a pass with a previously used idempotency key."
+  ],
+  "design_decisions": [
+    "Use SQLite :memory: with a single persistent connection to ensure state across calls.",
+    "Use UUIDs for booking_id to ensure uniqueness.",
+    "Implement a ledger-based approach for session passes to ensure auditability and idempotency."
+  ],
+  "assumptions": [
+    "ISO 8601 strings are used for all time comparisons.",
+    "FIFO order for waitlist is determined by the autoincrement primary key of the waitlist table."
+  ],
+  "unresolved_items": [],
+  "extensions": {
+    "reconciliation_logic": "is_balanced = (total_issued == total_remaining + total_used) && (total_used == active_bookings) && (active_bookings == booked_slots)"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "run_id": "20261014T034206Z_track2_no_design_r001_16fb9d93",
+  "task_id": "brief_v2_large",
+  "condition": "no_design",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "model_calls": 20,
+  "tool_calls": 20,
+  "input_tokens": 122031,
+  "output_tokens": 37875,
+  "total_tokens": 159906,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 20,
+  "ttft_ms": 24653.064,
+  "first_text_ms": null,
+  "generation_ms": 3324678.711,
+  "total_latency_ms": 3380061.759,
+  "generation_tokens_per_second": 11.392,
+  "tool_time_ms": 3.815,
+  "agent_turn_ms": 3380114.129
+}

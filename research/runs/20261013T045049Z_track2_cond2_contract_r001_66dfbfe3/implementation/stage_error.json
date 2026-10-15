@@ -1,0 +1,4 @@
+{
+  "error_type": "RuntimeError",
+  "message": "llama-server HTTP 400: {\"error\":{\"code\":400,\"message\":\"request (12820 tokens) exceeds the available context size (12288 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":12820,\"n_ctx\":12288}}"
+}

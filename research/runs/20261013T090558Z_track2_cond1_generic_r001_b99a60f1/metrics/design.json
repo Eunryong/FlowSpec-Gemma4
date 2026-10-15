@@ -1,0 +1,22 @@
+{
+  "run_id": "20261013T090558Z_track2_cond1_generic_r001_b99a60f1",
+  "task_id": "brief_v1",
+  "condition": "cond1_generic",
+  "stage": "design",
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1271,
+  "output_tokens": 2234,
+  "total_tokens": 3505,
+  "token_usage_complete": true,
+  "ttft_ms": 3935.122,
+  "first_text_ms": 80252.733,
+  "prefill_ms": 3175.804,
+  "generation_ms": 187660.208,
+  "total_latency_ms": 191595.329,
+  "generation_tokens_per_second": 11.904,
+  "tool_time_ms": 0,
+  "agent_turn_ms": 191628.637
+}
