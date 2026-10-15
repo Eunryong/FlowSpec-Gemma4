@@ -20,8 +20,8 @@ Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tab
 
 1. **Free-form prose design (`Cond 1`) underperforms no design (`Cond 0-Pure`) at both scales**, exhausting the 15-step budget, inflating total token cost by 59%–219%, and introducing a branch-omission bug (`6/8` on V2 vs. `7/8` without design).
 2. **Declarative state invariants (`Cond 3`) are brittle across repetitions (`n = 3`)**, passing `7/8` in `r1` (`67,569` tokens) but collapsing to `1/8` in `r2` and `r3` (`146,112` and `154,716` tokens) due to an SQLite mid-generation self-correction double-counting bug (`3.00 ± 3.46 / 8`).
-3. **Numbered execution-flow specifications (`Cond 4-Flow`, `Step 1` $\rightarrow$ `Step N`) maximize both accuracy and stability**, achieving the lowest cost on V1 (`33,219` tokens, `7` steps, `6/6`) and the highest verification accuracy on V2 (`7.67 ± 0.58 / 8`, passing `8/8` in `2/3` runs) with **`83,878 ± 3,302` total tokens (`CV = 3.9%`)** and **`16,560 ± 418` coder output tokens (`CV = 2.5%`)**.
-4. **Information-content control (`Cond 4-Unordered` vs. `Cond 4-Flow`) proves that step ordering—not wording—prevents lifecycle bugs:** providing the exact same JSON text, schemas, and `"return existing booking (regardless of status)"` rule with step numbers stripped and bullets shuffled cuts the `8/8` pass rate from `2/3` (`66.7%`) to `1/3` (`33.3%`) and inflates total token standard deviation 12.9-fold (`± 42,688` vs. `± 3,302`).
+3. **Numbered execution-flow specifications (`Cond 4-Flow`, `Step 1 → Step N`) maximize both accuracy and stability**, achieving the lowest cost on V1 (`33,219` tokens, `7` steps, `6/6`) and the highest verification accuracy on V2 (`7.67 ± 0.58 / 8`, passing `8/8` in `2/3` runs) with **`83,878 ± 3,302` total tokens (`CV = 3.9%`)** and **`16,560 ± 418` coder output tokens (`CV = 2.5%`)**.
+4. **Information-content control (`Cond 4-Unordered` vs. `Cond 4-Flow`) proves that step ordering—not wording—prevents lifecycle bugs:** providing the exact same JSON text, schemas, and unconditional lookup rule (`"If idempotency_key exists in bookings, return existing booking."`) with step numbers stripped and bullets shuffled cuts the `8/8` pass rate from `2/3` (`66.7%`) to `1/3` (`33.3%`) and inflates total token standard deviation 12.9-fold (`± 42,688` vs. `± 3,302`).
 
 ---
 
@@ -69,13 +69,13 @@ Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tab
 
 ### Core Directories
 
-- [`docs/kaggle_gemma4_paper_en.md`](docs/kaggle_gemma4_paper_en.md) — English submission paper (`2,844` words).
+- [`docs/kaggle_gemma4_paper_en.md`](docs/kaggle_gemma4_paper_en.md) — English submission paper (`2,908` words).
 - [`docs/kaggle_gemma4_paper_ko.md`](docs/kaggle_gemma4_paper_ko.md) — 1:1 Korean translation of the submission paper.
 - [`research/briefs/`](research/briefs/) — Benchmark task requirements:
   - [`brief_v1.md`](research/briefs/brief_v1.md): Small-Scale Task (V1 — 2 tables, 5 public methods, `REQ-1`–`REQ-6`).
   - [`brief_v2_counseling_large.md`](research/briefs/brief_v2_counseling_large.md): Large-Scale Task (V2 — 4 subsystems, 7 coupled tables, 13 public methods, `REQ-1`–`REQ-8`).
 - [`research/conditions/track2/`](research/conditions/track2/) — Condition prompt definitions (`no_design.md`, `cond1_generic.md`, `cond2_contract.md`, `cond3_invariant.md`, `cond4_flow.md`, `cond4_unordered.md`, `cond5_profiled.md`).
-- [`research/inputs/design_spec_unordered.json`](research/inputs/design_spec_unordered.json) — Frozen information-controlled shuffled specification (`Cond 4-Unordered`) derived from `Cond 4-Flow` (`r1`).
+- [`research/inputs/design_spec_cond4_unordered.json`](research/inputs/design_spec_cond4_unordered.json) — Frozen information-controlled shuffled specification (`Cond 4-Unordered`) derived from `Cond 4-Flow` (`r1`).
 - [`research/outputs/ablation_and_repetitions_summary.json`](research/outputs/ablation_and_repetitions_summary.json) — Complete per-run and group-level (`n = 3`) telemetry and `REQ-1`–`REQ-8` verification results.
 - [`scripts/inspect_servers.py`](scripts/inspect_servers.py) — Standard Verification Suite (`REQ-1`–`REQ-6` for V1; `REQ-1`–`REQ-8` for V2) and multi-port interactive web inspection dashboard (ports `8100`–`8125`).
 - [`scripts/run_ablation_and_repetitions.py`](scripts/run_ablation_and_repetitions.py) — Automation and aggregation script for `Cond 0-Pure`, `Cond 4-Unordered`, and `n = 3` repetitions.
@@ -83,7 +83,7 @@ Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tab
 
 ### Artifact Index: Mapping Paper Tables 1–3 to `research/runs/<run_id>`
 
-Each directory under [`research/runs/`](research/runs/) contains `metadata.json`, `design/design_spec.json` (when Stage 1 is enabled), `implementation/counseling_engine.py`, `logs/design_trace.jsonl`, `logs/implementation_trace.jsonl`, and `metrics/cost_metrics.json`.
+Each directory under [`research/runs/`](research/runs/) contains `metadata.json`, `design/design_spec.json` and `design/.agent/trace.jsonl` (when Stage 1 is enabled), `implementation/counseling_engine.py`, `implementation/.agent/trace.jsonl`, and `metrics/` (`design.json`, `implementation.json`, `total.json`).
 
 #### Small-Scale Task (V1 — Table 1, 6 Runs)
 
@@ -190,7 +190,7 @@ llama-server \
   --condition cond4_unordered \
   --brief research/briefs/brief_v2_counseling_large.md \
   --task-id brief_v2_counseling_large \
-  --fixed-design research/inputs/design_spec_unordered.json \
+  --fixed-design research/inputs/design_spec_cond4_unordered.json \
   --repetitions 1 \
   --context-length 12288 \
   --max-output-tokens 4608 \
@@ -219,4 +219,4 @@ The Stage 2 Coder agent operates inside an isolated workspace with **five worksp
 - `replace_text` — Replace a contiguous block of text in an existing file.
 - `run_tests` — Execute `pytest` inside the workspace and return stdout/stderr.
 
-There is no arbitrary shell execution, internet access, or filesystem access outside the run workspace. Every model turn and tool result is recorded to JSONL traces (`logs/design_trace.jsonl` and `logs/implementation_trace.jsonl`) with per-call token usage, time-to-first-token (TTFT), generation latency, and tool execution timing.
+There is no arbitrary shell execution, internet access, or filesystem access outside the run workspace. Every model turn and tool result is recorded to JSONL traces (`design/.agent/trace.jsonl` and `implementation/.agent/trace.jsonl`) with per-call token usage, time-to-first-token (TTFT), generation latency, and tool execution timing in `metrics/design.json`, `metrics/implementation.json`, and `metrics/total.json`.
