@@ -28,7 +28,7 @@ We address two questions in a local harness without commercial framework retries
 
 ### 3.1 Experimental Harness and Model Configuration
 
-All 22 runs used **Gemma 4 31B-IT** (`Q4_K_M` GGUF) on `llama.cpp` (single server slot) at `temperature=0.2`, `context_length=12,288` tokens (near ceiling, history compaction retains the initial prompt and 6 latest messages while summarizing older turns), and a `15`-step budget.
+All 22 runs used **Gemma 4 31B-IT** (`Q4_K_M` GGUF) on `llama.cpp` (single server slot) at `temperature=0.2` (standard low-temperature coding setting to prevent tool-call JSON syntax noise), `context_length=12,288` tokens (near ceiling, history compaction retains the initial prompt and 6 latest messages while summarizing older turns), and a `15`-step budget.
 - **Stage 1 (Designer):** Takes task requirements and condition instructions, generating a structured JSON specification and markdown overview in one turn without tools.
 - **Stage 2 (Coder):** Receives only task requirements and the Stage 1 artifact in a clean workspace with five jailed tools across three roles: (1) workspace inspection (listing directories and reading files), (2) code editing (writing full files and replacing text blocks), and (3) automated testing (running `pytest` and returning output traces).
 
@@ -186,7 +186,7 @@ In V2 `Cond 5`, behavioral rules and checklists stimulated Gemma 4's thinking mo
 4. **Keep design outputs compact (`~1,500`–`2,500` tokens) without meta-behavioral checklists under `12k` context windows** to avoid `4,608`-token output truncations and compaction loops (`Cond 5`, `156,890` tokens).
 
 ### 5.2 Limitations and Reproducibility
-Our study covers single-module SQLite backends (`n=3` per core group, 15-step budget) on local quantized hardware. All 22 run artifacts, prompts, JSON specifications, generated engines, JSONL traces, and verification suites are publicly preserved for deterministic reproduction.
+Our study covers single-module SQLite backends (`n=3` per core group, 15-step budget) on local quantized hardware at `temperature=0.2`; evaluating higher temperatures (`0.6`–`0.8`) under `pass@k` sampling and multi-file repositories remains future work. All 22 run artifacts, prompts, JSON specifications, generated engines, JSONL traces, and verification suites are publicly preserved for deterministic reproduction.
 
 ### References
 1. Gemma Team, Google DeepMind. *Gemma 4 Technical Report.* arXiv:2607.02770 (2026); and *Gemma: Open Models Based on Gemini Research and Technology.* arXiv:2403.08295 (2024).
