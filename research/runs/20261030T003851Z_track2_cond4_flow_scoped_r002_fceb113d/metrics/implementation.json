@@ -1,0 +1,23 @@
+{
+  "run_id": "20261030T003851Z_track2_cond4_flow_scoped_r002_fceb113d",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond4_flow_scoped",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "model_calls": 15,
+  "tool_calls": 15,
+  "input_tokens": 120591,
+  "output_tokens": 45724,
+  "total_tokens": 166315,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 15,
+  "ttft_ms": 1226.86,
+  "first_text_ms": null,
+  "generation_ms": 4619895.127,
+  "total_latency_ms": 4856177.458,
+  "generation_tokens_per_second": 9.897,
+  "tool_time_ms": 4.573,
+  "agent_turn_ms": 4856240.152
+}

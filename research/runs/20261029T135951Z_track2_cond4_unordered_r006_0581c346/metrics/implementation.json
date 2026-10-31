@@ -1,0 +1,23 @@
+{
+  "run_id": "20261029T135951Z_track2_cond4_unordered_r006_0581c346",
+  "task_id": "brief_v2_counseling_large",
+  "condition": "cond4_unordered",
+  "stage": "implementation",
+  "turn_id": 1,
+  "status": "completed",
+  "error_type": null,
+  "model_calls": 8,
+  "tool_calls": 6,
+  "input_tokens": 55565,
+  "output_tokens": 17423,
+  "total_tokens": 72988,
+  "token_usage_complete": true,
+  "model_calls_with_usage": 8,
+  "ttft_ms": 27609.677,
+  "first_text_ms": 1536878.208,
+  "generation_ms": 1442007.684,
+  "total_latency_ms": 1549402.064,
+  "generation_tokens_per_second": 12.082,
+  "tool_time_ms": 235.998,
+  "agent_turn_ms": 1549657.129
+}

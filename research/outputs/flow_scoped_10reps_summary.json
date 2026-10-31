@@ -1,0 +1,750 @@
+{
+  "title": "Method-Scoped Disambiguation (Cond 4-Flow + Scoped) n=10 Full Evaluation",
+  "condition": "cond4_flow_scoped",
+  "updated_at": "2026-10-30T12:25:41Z",
+  "completed_jobs": [
+    "cond4_flow_scoped_r001:20261029T225731Z_track2_cond4_flow_scoped_r001_e11217cb",
+    "cond4_flow_scoped_r002:20261030T003851Z_track2_cond4_flow_scoped_r002_fceb113d",
+    "cond4_flow_scoped_r003:20261030T020805Z_track2_cond4_flow_scoped_r003_7d83e144",
+    "cond4_flow_scoped_r004:20261030T033713Z_track2_cond4_flow_scoped_r004_b91374e5",
+    "cond4_flow_scoped_r005:20261030T050721Z_track2_cond4_flow_scoped_r005_f3826222",
+    "cond4_flow_scoped_r006:20261030T054851Z_track2_cond4_flow_scoped_r006_2ff7e287",
+    "cond4_flow_scoped_r007:20261030T062622Z_track2_cond4_flow_scoped_r007_8a5f2167",
+    "cond4_flow_scoped_r008:20261030T070701Z_track2_cond4_flow_scoped_r008_4460c477",
+    "cond4_flow_scoped_r009:20261030T101226Z_track2_cond4_flow_scoped_r009_3aecc0f0",
+    "cond4_flow_scoped_r010:20261030T112121Z_track2_cond4_flow_scoped_r010_1c552853"
+  ],
+  "runs": [
+    {
+      "run_id": "20261029T225731Z_track2_cond4_flow_scoped_r001_e11217cb",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "completed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 8,
+      "impl_tool_calls": 6,
+      "impl_input_tokens": 58148,
+      "impl_output_tokens": 17080,
+      "impl_time_s": 1777.68,
+      "total_tokens": 75228,
+      "total_time_m": 29.63,
+      "agent_pytest": "8 passed in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 1,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T003851Z_track2_cond4_flow_scoped_r002_fceb113d",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "failed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 15,
+      "impl_tool_calls": 15,
+      "impl_input_tokens": 120591,
+      "impl_output_tokens": 45724,
+      "impl_time_s": 4856.24,
+      "total_tokens": 166315,
+      "total_time_m": 80.94,
+      "agent_pytest": "no tests ran in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 2,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T020805Z_track2_cond4_flow_scoped_r003_7d83e144",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "failed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 15,
+      "impl_tool_calls": 15,
+      "impl_input_tokens": 120605,
+      "impl_output_tokens": 41755,
+      "impl_time_s": 5347.4,
+      "total_tokens": 162360,
+      "total_time_m": 89.12,
+      "agent_pytest": "no tests ran in 0.00s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 3,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T033713Z_track2_cond4_flow_scoped_r004_b91374e5",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "failed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 15,
+      "impl_tool_calls": 15,
+      "impl_input_tokens": 123191,
+      "impl_output_tokens": 43559,
+      "impl_time_s": 5407.69,
+      "total_tokens": 166750,
+      "total_time_m": 90.13,
+      "agent_pytest": "no tests ran in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 4,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key = ?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T050721Z_track2_cond4_flow_scoped_r005_f3826222",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "completed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 9,
+      "impl_tool_calls": 8,
+      "impl_input_tokens": 64971,
+      "impl_output_tokens": 25956,
+      "impl_time_s": 2489.95,
+      "total_tokens": 90927,
+      "total_time_m": 41.5,
+      "agent_pytest": "8 passed in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 5,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T054851Z_track2_cond4_flow_scoped_r006_2ff7e287",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "completed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 7,
+      "impl_tool_calls": 5,
+      "impl_input_tokens": 47758,
+      "impl_output_tokens": 15538,
+      "impl_time_s": 1883.67,
+      "total_tokens": 63296,
+      "total_time_m": 31.39,
+      "agent_pytest": "8 passed in 0.02s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 6,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T062622Z_track2_cond4_flow_scoped_r007_8a5f2167",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "completed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 6,
+      "impl_tool_calls": 5,
+      "impl_input_tokens": 41413,
+      "impl_output_tokens": 12675,
+      "impl_time_s": 2438.18,
+      "total_tokens": 54088,
+      "total_time_m": 40.64,
+      "agent_pytest": "8 passed in 0.03s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 7,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key = ?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T070701Z_track2_cond4_flow_scoped_r008_4460c477",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "failed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 15,
+      "impl_tool_calls": 14,
+      "impl_input_tokens": 118621,
+      "impl_output_tokens": 43630,
+      "impl_time_s": 8755.96,
+      "total_tokens": 162251,
+      "total_time_m": 145.93,
+      "agent_pytest": "no tests ran in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 8,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key = ?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T101226Z_track2_cond4_flow_scoped_r009_3aecc0f0",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "completed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 9,
+      "impl_tool_calls": 7,
+      "impl_input_tokens": 64791,
+      "impl_output_tokens": 21709,
+      "impl_time_s": 4133.96,
+      "total_tokens": 86500,
+      "total_time_m": 68.9,
+      "agent_pytest": "8 passed in 0.01s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 9,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()"
+      ]
+    },
+    {
+      "run_id": "20261030T112121Z_track2_cond4_flow_scoped_r010_1c552853",
+      "condition": "cond4_flow_scoped",
+      "design_status": "fixed",
+      "effective_status": "failed",
+      "design_input_tokens": 0,
+      "design_output_tokens": 0,
+      "design_time_s": 0.0,
+      "impl_steps": 15,
+      "impl_tool_calls": 15,
+      "impl_input_tokens": 119468,
+      "impl_output_tokens": 43353,
+      "impl_time_s": 3859.89,
+      "total_tokens": 162821,
+      "total_time_m": 64.33,
+      "agent_pytest": "no tests ran in 0.00s",
+      "std_verify_passed": 8,
+      "std_verify_total": 8,
+      "passed_reqs": [
+        "REQ-1",
+        "REQ-2",
+        "REQ-3",
+        "REQ-4",
+        "REQ-5",
+        "REQ-6",
+        "REQ-7",
+        "REQ-8"
+      ],
+      "failed_reqs": [],
+      "req_details": {
+        "REQ-1": {
+          "passed": true,
+          "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+        },
+        "REQ-2": {
+          "passed": true,
+          "actual": "remaining_sessions=3, used_sessions=0"
+        },
+        "REQ-3": {
+          "passed": true,
+          "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+        },
+        "REQ-4": {
+          "passed": true,
+          "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+        },
+        "REQ-5": {
+          "passed": true,
+          "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+        },
+        "REQ-6": {
+          "passed": true,
+          "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+        },
+        "REQ-7": {
+          "passed": true,
+          "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+        },
+        "REQ-8": {
+          "passed": true,
+          "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+        }
+      },
+      "load_error": null,
+      "repetition_number": 10,
+      "has_status_filter_in_idempotency": false,
+      "idempotency_select_queries": [
+        "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key = ?\", (idempotency_key,)).fetchone()"
+      ]
+    }
+  ],
+  "stats": {
+    "n": 10,
+    "total_tokens": {
+      "mean": 119053.6,
+      "std": 48610.24,
+      "n": 10
+    },
+    "impl_output_tokens": {
+      "mean": 31097.9,
+      "std": 13673.26,
+      "n": 10
+    },
+    "impl_steps": {
+      "mean": 11.4,
+      "std": 3.89,
+      "n": 10
+    },
+    "total_time_m": {
+      "mean": 68.25,
+      "std": 35.67,
+      "n": 10
+    },
+    "std_verify_passed": {
+      "mean": 8.0,
+      "std": 0.0,
+      "n": 10
+    },
+    "req8_pass_rate": "10/10",
+    "full_8_of_8_rate": "10/10",
+    "status_filter_leaked_rate": "0/10"
+  }
+}

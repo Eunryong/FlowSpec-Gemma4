@@ -1,0 +1,1438 @@
+{
+  "title": "Cond 4-Flow vs Cond 4-Unordered Full-Project Ablation (n=10)",
+  "updated_at": "2026-10-29T18:59:22Z",
+  "completed_jobs": [
+    "cond4_flow_r001:20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+    "cond4_flow_r002:20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+    "cond4_flow_r003:20261015T075232Z_track2_cond4_flow_r001_e5655784",
+    "cond4_unordered_r001:20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+    "cond4_unordered_r002:20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+    "cond4_unordered_r003:20261015T092254Z_track2_cond4_unordered_r001_574b9eb5",
+    "cond4_flow_r004:20261029T101223Z_track2_cond4_flow_r004_5fd493f7",
+    "cond4_unordered_r004:20261029T105642Z_track2_cond4_unordered_r004_be184ca4",
+    "cond4_flow_r005:20261029T122750Z_track2_cond4_flow_r005_4a58377d",
+    "cond4_unordered_r005:20261029T131553Z_track2_cond4_unordered_r005_7f0d7f01",
+    "cond4_flow_r006:20261029T134018Z_track2_cond4_flow_r006_4d393c1d",
+    "cond4_unordered_r006:20261029T135951Z_track2_cond4_unordered_r006_0581c346",
+    "cond4_flow_r007:20261029T142541Z_track2_cond4_flow_r007_2f080d03",
+    "cond4_unordered_r007:20261029T150113Z_track2_cond4_unordered_r007_56ddd9bd",
+    "cond4_flow_r008:20261029T152711Z_track2_cond4_flow_r008_bd603a95",
+    "cond4_unordered_r008:20261029T162409Z_track2_cond4_unordered_r008_5c4b8dd1",
+    "cond4_flow_r009:20261029T164621Z_track2_cond4_flow_r009_2b4bbbdd",
+    "cond4_unordered_r009:20261029T170612Z_track2_cond4_unordered_r009_a3888de2",
+    "cond4_flow_r010:20261029T172442Z_track2_cond4_flow_r010_8d5e4de9",
+    "cond4_unordered_r010:20261029T183411Z_track2_cond4_unordered_r010_2b3cc446"
+  ],
+  "groups": {
+    "cond4_flow": [
+      {
+        "run_id": "20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+        "condition": "cond4_flow",
+        "design_status": "valid",
+        "effective_status": "completed",
+        "design_input_tokens": 4501,
+        "design_output_tokens": 1547,
+        "design_time_s": 285.76,
+        "impl_steps": 10,
+        "impl_tool_calls": 8,
+        "impl_input_tokens": 63150,
+        "impl_output_tokens": 16134,
+        "impl_time_s": 1411.94,
+        "total_tokens": 85332,
+        "total_time_m": 28.3,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null
+      },
+      {
+        "run_id": "20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+        "condition": "cond4_flow",
+        "design_status": "valid",
+        "effective_status": "completed",
+        "design_input_tokens": 4501,
+        "design_output_tokens": 1638,
+        "design_time_s": 288.1,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 56990,
+        "impl_output_tokens": 16969,
+        "impl_time_s": 1531.33,
+        "total_tokens": 80098,
+        "total_time_m": 30.32,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 2
+      },
+      {
+        "run_id": "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+        "condition": "cond4_flow",
+        "design_status": "valid",
+        "effective_status": "completed",
+        "design_input_tokens": 4454,
+        "design_output_tokens": 3777,
+        "design_time_s": 354.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 61397,
+        "impl_output_tokens": 16576,
+        "impl_time_s": 1697.59,
+        "total_tokens": 86204,
+        "total_time_m": 34.19,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 3
+      },
+      {
+        "run_id": "20261029T101223Z_track2_cond4_flow_r004_5fd493f7",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 56018,
+        "impl_output_tokens": 17582,
+        "impl_time_s": 2657.43,
+        "total_tokens": 73600,
+        "total_time_m": 44.29,
+        "agent_pytest": "8 passed in 0.05s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 4,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T122750Z_track2_cond4_flow_r005_4a58377d",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 55833,
+        "impl_output_tokens": 17259,
+        "impl_time_s": 2882.46,
+        "total_tokens": 73092,
+        "total_time_m": 48.04,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 5,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T134018Z_track2_cond4_flow_r006_4d393c1d",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 6,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 39743,
+        "impl_output_tokens": 12747,
+        "impl_time_s": 1172.8,
+        "total_tokens": 52490,
+        "total_time_m": 19.55,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 6,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T142541Z_track2_cond4_flow_r007_2f080d03",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 10,
+        "impl_tool_calls": 8,
+        "impl_input_tokens": 72302,
+        "impl_output_tokens": 23991,
+        "impl_time_s": 2131.52,
+        "total_tokens": 96293,
+        "total_time_m": 35.53,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 7,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T152711Z_track2_cond4_flow_r008_bd603a95",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "failed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 15,
+        "impl_tool_calls": 15,
+        "impl_input_tokens": 117022,
+        "impl_output_tokens": 38362,
+        "impl_time_s": 3418.14,
+        "total_tokens": 155384,
+        "total_time_m": 56.97,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 8,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T164621Z_track2_cond4_flow_r009_2b4bbbdd",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 6,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 39829,
+        "impl_output_tokens": 13537,
+        "impl_time_s": 1191.24,
+        "total_tokens": 53366,
+        "total_time_m": 19.85,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 9,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      },
+      {
+        "run_id": "20261029T172442Z_track2_cond4_flow_r010_8d5e4de9",
+        "condition": "cond4_flow",
+        "design_status": "fixed",
+        "effective_status": "failed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 15,
+        "impl_tool_calls": 15,
+        "impl_input_tokens": 116649,
+        "impl_output_tokens": 47503,
+        "impl_time_s": 4168.91,
+        "total_tokens": 164152,
+        "total_time_m": 69.48,
+        "agent_pytest": "no tests ran in 0.00s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 10,
+        "fixed_spec_used": "design_spec_cond4_flow.json"
+      }
+    ],
+    "cond4_unordered": [
+      {
+        "run_id": "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 6,
+        "impl_tool_calls": 4,
+        "impl_input_tokens": 39438,
+        "impl_output_tokens": 15267,
+        "impl_time_s": 1394.32,
+        "total_tokens": 54705,
+        "total_time_m": 23.24,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 1
+      },
+      {
+        "run_id": "20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 56003,
+        "impl_output_tokens": 17914,
+        "impl_time_s": 1614.21,
+        "total_tokens": 73917,
+        "total_time_m": 26.9,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 2
+      },
+      {
+        "run_id": "20261015T092254Z_track2_cond4_unordered_r001_574b9eb5",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 14,
+        "impl_tool_calls": 13,
+        "impl_input_tokens": 101574,
+        "impl_output_tokens": 34778,
+        "impl_time_s": 3177.98,
+        "total_tokens": 136352,
+        "total_time_m": 52.97,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 3
+      },
+      {
+        "run_id": "20261029T105642Z_track2_cond4_unordered_r004_be184ca4",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 6,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 40201,
+        "impl_output_tokens": 13187,
+        "impl_time_s": 2433.94,
+        "total_tokens": 53388,
+        "total_time_m": 40.57,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 4,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T131553Z_track2_cond4_unordered_r005_7f0d7f01",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 7,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 45383,
+        "impl_output_tokens": 15350,
+        "impl_time_s": 1465.5,
+        "total_tokens": 60733,
+        "total_time_m": 24.43,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 5,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T135951Z_track2_cond4_unordered_r006_0581c346",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 55565,
+        "impl_output_tokens": 17423,
+        "impl_time_s": 1549.66,
+        "total_tokens": 72988,
+        "total_time_m": 25.83,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 6,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T150113Z_track2_cond4_unordered_r007_56ddd9bd",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 55524,
+        "impl_output_tokens": 17526,
+        "impl_time_s": 1557.65,
+        "total_tokens": 73050,
+        "total_time_m": 25.96,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 7,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T162409Z_track2_cond4_unordered_r008_5c4b8dd1",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 7,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 45386,
+        "impl_output_tokens": 15511,
+        "impl_time_s": 1331.33,
+        "total_tokens": 60897,
+        "total_time_m": 22.19,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 8,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T170612Z_track2_cond4_unordered_r009_a3888de2",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 6,
+        "impl_tool_calls": 5,
+        "impl_input_tokens": 40209,
+        "impl_output_tokens": 12455,
+        "impl_time_s": 1108.93,
+        "total_tokens": 52664,
+        "total_time_m": 18.48,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 8,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7",
+          "REQ-8"
+        ],
+        "failed_reqs": [],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": true,
+            "actual": "동일 booking_id=True, 상태=CANCELLED, 잔여상담권=2회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 9,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      },
+      {
+        "run_id": "20261029T183411Z_track2_cond4_unordered_r010_2b3cc446",
+        "condition": "cond4_unordered",
+        "design_status": "fixed",
+        "effective_status": "completed",
+        "design_input_tokens": 0,
+        "design_output_tokens": 0,
+        "design_time_s": 0.0,
+        "impl_steps": 8,
+        "impl_tool_calls": 6,
+        "impl_input_tokens": 55475,
+        "impl_output_tokens": 17267,
+        "impl_time_s": 1510.6,
+        "total_tokens": 72742,
+        "total_time_m": 25.18,
+        "agent_pytest": "8 passed in 0.01s",
+        "std_verify_passed": 7,
+        "std_verify_total": 8,
+        "passed_reqs": [
+          "REQ-1",
+          "REQ-2",
+          "REQ-3",
+          "REQ-4",
+          "REQ-5",
+          "REQ-6",
+          "REQ-7"
+        ],
+        "failed_reqs": [
+          "REQ-8"
+        ],
+        "req_details": {
+          "REQ-1": {
+            "passed": true,
+            "actual": "가용 슬롯=1개, BLOCKED 예약 차단=True"
+          },
+          "REQ-2": {
+            "passed": true,
+            "actual": "remaining_sessions=3, used_sessions=0"
+          },
+          "REQ-3": {
+            "passed": true,
+            "actual": "잔여=1, 사용=1, 가용슬롯=0, 감사로그=['BOOKING_CREATED']"
+          },
+          "REQ-4": {
+            "passed": true,
+            "actual": "가용슬롯=['2026-06-01T10:00:00'], 잔여상담권=0, 로그=['BOOKING_CREATED', 'BOOKING_RESCHEDULED']"
+          },
+          "REQ-5": {
+            "passed": true,
+            "actual": "취소 후 가용 슬롯=1개, 잔여 상담권=1회"
+          },
+          "REQ-6": {
+            "passed": true,
+            "actual": "홍길동 잔여=1, 1순위 잔여=0, 2순위 잔여=1"
+          },
+          "REQ-7": {
+            "passed": true,
+            "actual": "{\"total_issued_sessions\": 5, \"total_remaining_sessions\": 4, \"total_used_sessions\": 1, \"active_confirmed_bookings\": 1, \"booked_slots_count\": 1, \"is_balanced\": true}"
+          },
+          "REQ-8": {
+            "passed": false,
+            "actual": "동일 booking_id=False, 상태=CONFIRMED, 잔여상담권=1회"
+          }
+        },
+        "load_error": null,
+        "repetition_number": 10,
+        "fixed_spec_used": "design_spec_cond4_unordered.json"
+      }
+    ]
+  },
+  "group_stats": {
+    "cond4_flow": {
+      "n": 10,
+      "total_tokens": {
+        "mean": 92001.1,
+        "std": 38313.45,
+        "n": 10
+      },
+      "impl_output_tokens": {
+        "mean": 22066.0,
+        "std": 11597.01,
+        "n": 10
+      },
+      "impl_steps": {
+        "mean": 9.4,
+        "std": 3.24,
+        "n": 10
+      },
+      "total_time_m": {
+        "mean": 38.65,
+        "std": 16.09,
+        "n": 10
+      },
+      "std_verify_passed": {
+        "mean": 7.5,
+        "std": 0.53,
+        "n": 10
+      },
+      "req8_pass_rate": "5/10",
+      "full_8_of_8_rate": "5/10"
+    },
+    "cond4_unordered": {
+      "n": 10,
+      "total_tokens": {
+        "mean": 71143.6,
+        "std": 24517.06,
+        "n": 10
+      },
+      "impl_output_tokens": {
+        "mean": 17667.8,
+        "std": 6290.19,
+        "n": 10
+      },
+      "impl_steps": {
+        "mean": 7.8,
+        "std": 2.35,
+        "n": 10
+      },
+      "total_time_m": {
+        "mean": 28.57,
+        "std": 10.31,
+        "n": 10
+      },
+      "std_verify_passed": {
+        "mean": 7.4,
+        "std": 0.52,
+        "n": 10
+      },
+      "req8_pass_rate": "4/10",
+      "full_8_of_8_rate": "4/10"
+    }
+  }
+}

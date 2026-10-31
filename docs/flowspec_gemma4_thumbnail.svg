@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1008pt" height="504pt" viewBox="0 0 1008 504" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-31T19:06:56.653405</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 504
+L 1008 504
+L 1008 0
+L 0 0
+z
+" style="fill: #f6f4ef"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 408.24 352.8
+L 695.52 352.8
+L 695.52 166.32
+L 408.24 166.32
+L 408.24 352.8
+z
+" style="fill: none"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 408.24 352.8
+L 408.24 166.32
+" clip-path="url(#p2fa93d4100)" style="fill: none; stroke: #dddeda; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="408.24" y="369.157422" transform="rotate(-0 408.24 369.157422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 471.24 352.8
+L 471.24 166.32
+" clip-path="url(#p2fa93d4100)" style="fill: none; stroke: #dddeda; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="471.24" y="369.157422" transform="rotate(-0 471.24 369.157422)">25</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 534.24 352.8
+L 534.24 166.32
+" clip-path="url(#p2fa93d4100)" style="fill: none; stroke: #dddeda; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="534.24" y="369.157422" transform="rotate(-0 534.24 369.157422)">50</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 597.24 352.8
+L 597.24 166.32
+" clip-path="url(#p2fa93d4100)" style="fill: none; stroke: #dddeda; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="597.24" y="369.157422" transform="rotate(-0 597.24 369.157422)">75</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 660.24 352.8
+L 660.24 166.32
+" clip-path="url(#p2fa93d4100)" style="fill: none; stroke: #dddeda; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10"/>
+     <g id="text_5">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="660.24" y="369.157422" transform="rotate(-0 660.24 369.157422)">100%</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_11"/>
+     <g id="text_6">
+      <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #17282e" x="390.24" y="205.103989" transform="rotate(-0 390.24 205.103989)">Flow Base</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_12"/>
+     <g id="text_7">
+      <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #17282e" x="390.24" y="265.258828" transform="rotate(-0 390.24 265.258828)">Unordered</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_13"/>
+     <g id="text_8">
+      <text style="font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #17282e" x="390.24" y="325.413667" transform="rotate(-0 390.24 325.413667)">Flow + Scoped</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 408.24 213.842323
+L 534.24 213.842323
+L 534.24 184.968
+L 408.24 184.968
+z
+" clip-path="url(#p2fa93d4100)" style="fill: #9faeb2"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 408.24 273.997161
+L 509.04 273.997161
+L 509.04 245.122839
+L 408.24 245.122839
+z
+" clip-path="url(#p2fa93d4100)" style="fill: #c4b7a0"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 408.24 334.152
+L 660.24 334.152
+L 660.24 305.277677
+L 408.24 305.277677
+z
+" clip-path="url(#p2fa93d4100)" style="fill: #286978"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17282e" x="538.272" y="203.561411" transform="rotate(-0 538.272 203.561411)">5/10</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17282e" x="513.072" y="263.71625" transform="rotate(-0 513.072 263.71625)">4/10</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17282e" x="664.272" y="323.871089" transform="rotate(-0 664.272 323.871089)">10/10</text>
+   </g>
+  </g>
+  <g id="text_12">
+   <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #285f69" x="504" y="45.36" transform="rotate(-0 504 45.36)">FLOWSPEC-GEMMA4</text>
+  </g>
+  <g id="text_13">
+   <text style="font-weight: 700; font-size: 25px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #17282e" x="504" y="88.2" transform="rotate(-0 504 88.2)">Order &amp; Method Scope</text>
+  </g>
+  <g id="text_14">
+   <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #4c6066" x="504" y="120.96" transform="rotate(-0 504 120.96)">V2 artifact verification · n=10 per condition</text>
+  </g>
+  <g id="text_15">
+   <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #17282e" x="504" y="413.28" transform="rotate(-0 504 413.28)">SCOPED: 10/10 artifacts · 5/10 sessions completed</text>
+  </g>
+  <g id="text_16">
+   <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #285f69" x="504" y="443.52" transform="rotate(-0 504 443.52)">+29% total tokens vs Flow Base</text>
+  </g>
+  <g id="text_17">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #617378" x="504" y="476.28" transform="rotate(-0 504 476.28)">46 unique study runs · exploratory cohorts</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p2fa93d4100">
+   <rect x="408.24" y="166.32" width="287.28" height="186.48"/>
+  </clipPath>
+ </defs>
+</svg>

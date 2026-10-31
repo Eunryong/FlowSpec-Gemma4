@@ -1,0 +1,30 @@
+{
+  "run_id": "20261029T225731Z_track2_cond4_flow_scoped_r001_e11217cb",
+  "condition": "cond4_flow_scoped",
+  "elapsed_min": 29.64,
+  "verify_passed": 8,
+  "verify_total": 8,
+  "passed_reqs": [
+    "REQ-1",
+    "REQ-2",
+    "REQ-3",
+    "REQ-4",
+    "REQ-5",
+    "REQ-6",
+    "REQ-7",
+    "REQ-8"
+  ],
+  "failed_reqs": [],
+  "req8_passed": true,
+  "has_status_filter_in_idempotency": false,
+  "idempotency_query_snippets": [
+    "existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()",
+    "self.conn.execute(\"INSERT INTO pass_ledger (client_email, booking_id, entry_type, delta_sessions, idempotency_key) VALUES (?, ?, ?, ?, ?)\",",
+    "self.conn.execute(\"INSERT INTO bookings VALUES (?, ?, ?, ?, ?, ?, ?)\", (booking_id, counselor_id, start_time, client_name, client_email, \"CONFIRMED\", idempotency_key))"
+  ],
+  "impl_steps": 8,
+  "total_tokens": 75228,
+  "create_booking_code": "    def create_booking(self, counselor_id, start_time, client_name, client_email, idempotency_key=None):\n        if idempotency_key:\n            existing = self.conn.execute(\"SELECT * FROM bookings WHERE idempotency_key=?\", (idempotency_key,)).fetchone()\n            if existing: return dict(existing)\n        \n        with self.conn:\n            slot = self.conn.execute(\"SELECT slot_id, status FROM slots WHERE counselor_id=? AND start_time=?\", (counselor_id, start_time)).fetchone()\n            if not slot or slot['status'] != \"AVAILABLE\": raise ValueError(\"Slot unavailable\")\n            pass_info = self.get_session_pass(client_email)\n            if pass_info['remaining_sessions'] < 1: raise ValueError(\"Insufficient sessions\")\n            \n            booking_id = str(uuid.uuid4())\n            self.conn.execute(\"UPDATE slots SET status='BOOKED' WHERE slot_id=?\", (slot['slot_id'],))\n            self.conn.execute(\"UPDATE session_passes SET remaining_sessions=remaining_sessions-1, used_sessions=used_sessions+1 WHERE client_email=?\", (client_email,))\n            self.conn.execute(\"INSERT INTO pass_ledger (client_email, booking_id, entry_type, delta_sessions, idempotency_key) VALUES (?, ?",
+  "idempotency_lookup_query": "SELECT * FROM bookings WHERE idempotency_key=?",
+  "has_status_filter_in_idempotency_select": false
+}

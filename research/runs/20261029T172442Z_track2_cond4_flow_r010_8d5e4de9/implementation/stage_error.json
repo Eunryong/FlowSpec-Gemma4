@@ -1,0 +1,4 @@
+{
+  "error_type": "RuntimeError",
+  "message": "Agent exceeded max steps (15)"
+}

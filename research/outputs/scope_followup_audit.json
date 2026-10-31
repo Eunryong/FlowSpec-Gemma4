@@ -1,0 +1,1151 @@
+{
+  "verification": "REQ-1..REQ-8 rerun from preserved implementations; no model calls",
+  "initial_study_n": 22,
+  "followup_n": 30,
+  "reused_initial_runs": [
+    "20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+    "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+    "20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+    "20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+    "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+    "20261015T092254Z_track2_cond4_unordered_r001_574b9eb5"
+  ],
+  "additional_n": 24,
+  "unique_study_n": 46,
+  "static_analysis_limit": "Static SQL strings inside create_booking; not a general SQL/data-flow analyzer or attention measurement.",
+  "all_success_10_exact_95_ci": [
+    0.691503,
+    1.0
+  ],
+  "groups": {
+    "cond4_flow": {
+      "n": 10,
+      "full_passes": 5,
+      "req8_passes": 5,
+      "status_filter_count": 5,
+      "harness_completed": 8,
+      "harness_failed": 2,
+      "score": {
+        "mean": 7.5,
+        "sample_sd": 0.53
+      },
+      "coder_steps": {
+        "mean": 9.4,
+        "sample_sd": 3.24
+      },
+      "coder_tokens": {
+        "mean": 89959.3,
+        "sample_sd": 38921.37
+      },
+      "total_tokens": {
+        "mean": 92001.1,
+        "sample_sd": 38313.45
+      },
+      "total_time_m": {
+        "mean": 38.65,
+        "sample_sd": 16.09
+      },
+      "runs": [
+        {
+          "run_id": "20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 10,
+          "coder_tokens": 79284,
+          "total_tokens": 85332,
+          "total_time_m": 28.3,
+          "design_status": "valid",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "6d2b4634f9b4c6514131423b9e6d1b63ce9720183fdb486b439e6de79324c3fd",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 300.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ? AND status = 'CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 73959,
+          "total_tokens": 80098,
+          "total_time_m": 30.32,
+          "design_status": "valid",
+          "design_sha256": "e9a1f609801ed62b7c94077a7ac6a2bdf4280b83c02b3950bfbc368d71a537b4",
+          "engine_sha256": "3f3403093264f52a5eede5e3e4e575df7b91333b8669de284b70e9a6e895d148",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 77973,
+          "total_tokens": 86204,
+          "total_time_m": 34.19,
+          "design_status": "valid",
+          "design_sha256": "bb2f6bcc718a98ee54b7619fb5fc8bbd6de099c132fbd6c6a86d79dd968e9d2b",
+          "engine_sha256": "9e8d49b396efa5d9e97c096da74532dbdcab7c6f77ae26205f5796554d4c3779",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T101223Z_track2_cond4_flow_r004_5fd493f7",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 73600,
+          "total_tokens": 73600,
+          "total_time_m": 44.29,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "6b45e9a0f6828a294f89439546763d088f8d5f96c36fdbf5ede5049b01ef57e2",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T122750Z_track2_cond4_flow_r005_4a58377d",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 73092,
+          "total_tokens": 73092,
+          "total_time_m": 48.04,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "871b5017e5a3ed68723005e72c6dd23ffec2fd7cebbe448f216a82526edd9261",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T134018Z_track2_cond4_flow_r006_4d393c1d",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 52490,
+          "total_tokens": 52490,
+          "total_time_m": 19.55,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "b1976cb9db4b411c4e63d93c380fd3a11810c95273b493a3812f8aed987c7ba7",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T142541Z_track2_cond4_flow_r007_2f080d03",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 10,
+          "coder_tokens": 96293,
+          "total_tokens": 96293,
+          "total_time_m": 35.53,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "d6c6eb884bd942de200c80faa97c467024b70c5671bb05aad2e9f4f8b91fe42d",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T152711Z_track2_cond4_flow_r008_bd603a95",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 155384,
+          "total_tokens": 155384,
+          "total_time_m": 56.97,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "705463af97c85c9d3fe2a76a1e7c070c5ca356285f93463aab50533cdb995be6",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T164621Z_track2_cond4_flow_r009_2b4bbbdd",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 53366,
+          "total_tokens": 53366,
+          "total_time_m": 19.85,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "b2d122bce2176663af732b659d6820b999e6c53a347e6e39c9f2be3eb95a190d",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T172442Z_track2_cond4_flow_r010_8d5e4de9",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ? AND status = 'CONFIRMED'"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 164152,
+          "total_tokens": 164152,
+          "total_time_m": 69.48,
+          "design_status": "fixed",
+          "design_sha256": "576b790a3268eed06a2d746885ea88b8f6ae40ab0b95b46d298efdd4906b8de7",
+          "engine_sha256": "6e5a02063987d8dbaaafa7f9b0893a2688d95c576dda0eaca9c5b1fb71aed6fa",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        }
+      ]
+    },
+    "cond4_unordered": {
+      "n": 10,
+      "full_passes": 4,
+      "req8_passes": 4,
+      "status_filter_count": 6,
+      "harness_completed": 10,
+      "harness_failed": 0,
+      "score": {
+        "mean": 7.4,
+        "sample_sd": 0.52
+      },
+      "coder_steps": {
+        "mean": 7.8,
+        "sample_sd": 2.35
+      },
+      "coder_tokens": {
+        "mean": 71143.6,
+        "sample_sd": 24517.06
+      },
+      "total_tokens": {
+        "mean": 71143.6,
+        "sample_sd": 24517.06
+      },
+      "total_time_m": {
+        "mean": 28.57,
+        "sample_sd": 10.31
+      },
+      "runs": [
+        {
+          "run_id": "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 54705,
+          "total_tokens": 54705,
+          "total_time_m": 23.24,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "abbf9587f79a77669a9c021a8acd2861e0118de130c4991b6481d5d68bb54034",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 73917,
+          "total_tokens": 73917,
+          "total_time_m": 26.9,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "629e373089c4f44f0175623c74096160d11a9dacb71ae77343c7e984bf612851",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261015T092254Z_track2_cond4_unordered_r001_574b9eb5",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ? AND status = 'CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 14,
+          "coder_tokens": 136352,
+          "total_tokens": 136352,
+          "total_time_m": 52.97,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "8e448947a37e68edf65e0f254e93ffd9d07f3555fb69c015259d1ec4d3cde4e9",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T105642Z_track2_cond4_unordered_r004_be184ca4",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ? AND status = 'CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 53388,
+          "total_tokens": 53388,
+          "total_time_m": 40.57,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "96f2a23037e315054db27d358a3f5b300e80c4e8f98436d3bd9c1d72c8210353",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T131553Z_track2_cond4_unordered_r005_7f0d7f01",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 7,
+          "coder_tokens": 60733,
+          "total_tokens": 60733,
+          "total_time_m": 24.43,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "4df5c40feabb5411025ded86eacd04abc521615249737d949023564633c1bbb4",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T135951Z_track2_cond4_unordered_r006_0581c346",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 72988,
+          "total_tokens": 72988,
+          "total_time_m": 25.83,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "471860b08634fbfc85197f046ca4de244a3e2172b47591993b3f4cbaa1cd898e",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T150113Z_track2_cond4_unordered_r007_56ddd9bd",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 73050,
+          "total_tokens": 73050,
+          "total_time_m": 25.96,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "fcc1091bf035b1c5b949a38f0336d43f664090aafd170a88d5cb5f739d46b134",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T162409Z_track2_cond4_unordered_r008_5c4b8dd1",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 7,
+          "coder_tokens": 60897,
+          "total_tokens": 60897,
+          "total_time_m": 22.19,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "ec5db69e165038ecead2412cd6bdbfc3e2ba55e981a194fa3d398d8e5c3d8c99",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T170612Z_track2_cond4_unordered_r009_a3888de2",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 52664,
+          "total_tokens": 52664,
+          "total_time_m": 18.48,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "89a7d6f9241bdfba4939b22cbfcab5b933600cd9640329ef4e589e1c54f2e8a0",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261029T183411Z_track2_cond4_unordered_r010_2b3cc446",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7"
+          ],
+          "score": 7,
+          "status_filter_in_idempotency": true,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 72742,
+          "total_tokens": 72742,
+          "total_time_m": 25.18,
+          "design_status": "fixed",
+          "design_sha256": "8adf57dfcda57f20283f5bf06f8dfe7dbe834153872e0ac5a1be46a7907de68e",
+          "engine_sha256": "a28854592316ba0ea7a5f5998c312b0074a0964d17940672b0d0704f9c38950f",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        }
+      ]
+    },
+    "cond4_flow_scoped": {
+      "n": 10,
+      "full_passes": 10,
+      "req8_passes": 10,
+      "status_filter_count": 0,
+      "harness_completed": 5,
+      "harness_failed": 5,
+      "score": {
+        "mean": 8,
+        "sample_sd": 0.0
+      },
+      "coder_steps": {
+        "mean": 11.4,
+        "sample_sd": 3.89
+      },
+      "coder_tokens": {
+        "mean": 119053.6,
+        "sample_sd": 48610.24
+      },
+      "total_tokens": {
+        "mean": 119053.6,
+        "sample_sd": 48610.24
+      },
+      "total_time_m": {
+        "mean": 68.25,
+        "sample_sd": 35.67
+      },
+      "runs": [
+        {
+          "run_id": "20261029T225731Z_track2_cond4_flow_scoped_r001_e11217cb",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 8,
+          "coder_tokens": 75228,
+          "total_tokens": 75228,
+          "total_time_m": 29.63,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "90aef2c7b500c44e2f83392a5fe8dd5e0a384611efc585078f88a2a61cdeec86",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T003851Z_track2_cond4_flow_scoped_r002_fceb113d",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 166315,
+          "total_tokens": 166315,
+          "total_time_m": 80.94,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "adeb360ba0e660139bdc124a3786029b34cc8de0fd6322c67b09b1f20bf86e2e",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T020805Z_track2_cond4_flow_scoped_r003_7d83e144",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 162360,
+          "total_tokens": 162360,
+          "total_time_m": 89.12,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "a101bed1ea258268b4752b99e2ad84585162c75e23683faea4cda9ac56d7d49f",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T033713Z_track2_cond4_flow_scoped_r004_b91374e5",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ?"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 166750,
+          "total_tokens": 166750,
+          "total_time_m": 90.13,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "926f16ac788c8a01bef0f7f8a5aca5ee34477b09d0dc032bd6c42053a4daec74",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T050721Z_track2_cond4_flow_scoped_r005_f3826222",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 9,
+          "coder_tokens": 90927,
+          "total_tokens": 90927,
+          "total_time_m": 41.5,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "be9f43d1c86da973f13e646e7af08df65e2cac5ffe5c4fb2142b51beec0422c4",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T054851Z_track2_cond4_flow_scoped_r006_2ff7e287",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 7,
+          "coder_tokens": 63296,
+          "total_tokens": 63296,
+          "total_time_m": 31.39,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "8fb2dd4a9a68d20a9334a86fb95b7c02e44b691119a025ed55935211118becf9",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T062622Z_track2_cond4_flow_scoped_r007_8a5f2167",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 6,
+          "coder_tokens": 54088,
+          "total_tokens": 54088,
+          "total_time_m": 40.64,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "366f089cde8207732b5a2b5d9a520dae46a1624f8ac5e58172351ac6827e107b",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T070701Z_track2_cond4_flow_scoped_r008_4460c477",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ?"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 162251,
+          "total_tokens": 162251,
+          "total_time_m": 145.93,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "5f416f28284cd126da96320a17c10213438fe114a5d5f10ec3bd3070ab49e386",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T101226Z_track2_cond4_flow_scoped_r009_3aecc0f0",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key=?"
+          ],
+          "harness_status": "completed",
+          "implementation_error_type": null,
+          "coder_steps": 9,
+          "coder_tokens": 86500,
+          "total_tokens": 86500,
+          "total_time_m": 68.9,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "6d8ef922cfbdf1d50866d7eb64a7b543e4af0e8512c917668434739c2b2a8c38",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        },
+        {
+          "run_id": "20261030T112121Z_track2_cond4_flow_scoped_r010_1c552853",
+          "passed_reqs": [
+            "REQ-1",
+            "REQ-2",
+            "REQ-3",
+            "REQ-4",
+            "REQ-5",
+            "REQ-6",
+            "REQ-7",
+            "REQ-8"
+          ],
+          "score": 8,
+          "status_filter_in_idempotency": false,
+          "idempotency_select_queries": [
+            "SELECT * FROM bookings WHERE idempotency_key = ?"
+          ],
+          "harness_status": "failed",
+          "implementation_error_type": "RuntimeError",
+          "coder_steps": 15,
+          "coder_tokens": 162821,
+          "total_tokens": 162821,
+          "total_time_m": 64.33,
+          "design_status": "fixed",
+          "design_sha256": "172318b12057f5f499ecd87e9765ed6fcbce21eb562a1760fce68caa6567f2da",
+          "engine_sha256": "6b17673720cc02bff47d045106079fe13fbe201e99a841ab05cd98d68b4d6204",
+          "model_configuration": {
+            "temperature": 0.2,
+            "seed": null,
+            "context_length": 12288,
+            "max_output_tokens": 4608,
+            "timeout_seconds": 900.0,
+            "max_agent_steps": 15
+          }
+        }
+      ]
+    }
+  }
+}

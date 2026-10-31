@@ -1,76 +1,48 @@
-# Ordering Matters More Than Rules: Execution-Flow Specifications for Multi-Table Transactional Coding with Gemma 4 31B
+# FlowSpec-Gemma4: Execution Order and Method Scope in Transactional Code Generation
 
-**Subtitle:** Design Representations, Information-Controlled Ablations, and Multi-Run Stability in a Local Agent Harness
-
----
+**Subtitle:** 46 preserved runs, a 30-run follow-up, and the limits of ordering alone in a local Gemma 4 coding harness
 
 ## 1. Abstract
 
-Engineering teams often add an upfront design stage before asking local open-weights models to write software. We study how the structure of upfront design artifacts affects a locally hosted **Gemma 4 31B-IT** model (`temperature=0.2`, `12,288`-token context) implementing multi-table SQLite transactional reservation engines under a 15-step tool budget. Using a controlled two-stage local harness isolating a single-turn Designer session from a Coder session equipped with five workspace-jailed file and test tools, we analyze **22 end-to-end runs** across two 1:1 counseling benchmarks: a small-scale task (2 relational tables, 5 public operations, 6 checks) and a large-scale task (4 subsystems, 7 coupled tables, 13 public operations, and 8 checks covering prepaid pass ledgers, atomic rescheduling, FIFO waitlist promotion, cross-table reconciliation, and idempotent replay of cancelled bookings). Evaluating six design representations, a pure no-design baseline, an information-controlled unordered ablation, and `n=3` repetitions on core large-scale groups yields four findings:
-1. **Unstructured prose design underperforms no design at both scales**, hitting the 15-step ceiling, adding 59%–219% more tokens, and causing branch-omission bugs (`6/8` on the large-scale task vs. `7/8` without design).
-2. **Declarative state invariants are brittle across repetitions (`n=3`)**, passing `7/8` in run 1 (`67,569` tokens) but dropping to `1/8` in runs 2 and 3 (`146,112` and `154,716` tokens) due to a mid-generation SQL self-correction bug that double-counts issued passes (`3.00±3.46 / 8`).
-3. **Numbered execution-flow specifications (`Step 1→Step N`) maximize accuracy and stability**, achieving the lowest cost on the small-scale task (`33,219` tokens, `7` steps, `6/6`) and the highest score on the large-scale task (`7.67±0.58 / 8`, passing `8/8` in `2/3` runs) with **`83,878±3,302` total tokens (`CV=3.9%`)** and **`16,560±418` coder output tokens (`CV=2.5%`)**—12.9×–14.9× lower total token standard deviation than other repeated groups.
-4. **Information-content control proves that step ordering—not wording—prevents lifecycle bugs.** Giving the Coder the identical JSON text, schemas, and unconditional lookup rule (`"If idempotency_key exists in bookings, return existing booking."`) with step numbers stripped and bullets shuffled cuts the `8/8` pass rate from `2/3` (`66.7%`) to `1/3` (`33.3%`) and inflates total token standard deviation 12.9-fold (`± 42,688` vs. `± 3,302`).
+We study how design specifications affect a local coding agent implementing SQLite reservation engines. The reported model is **Gemma 4 31B-IT**, served through `llama.cpp` with a `12,288`-token context and `temperature=0.2`. The study comprises **46 unique runs**: an initial 22-run comparison across two task scales and 24 additional V2 runs. The follow-up contains **30 observations, n=10 per condition**, including six observations reused from the initial study. It compares numbered execution flow, shuffled unnumbered flow, and execution flow augmented with an explicit method-scoped idempotency rule.
 
----
+Re-running eight external requirement checks on the 30 preserved implementations reproduces full-pass counts of **5/10, 4/10, and 10/10**, respectively. A booking-status predicate in the idempotency lookup appears in **5/10, 6/10, and 0/10** implementations. The scoped intervention therefore has the best observed artifact correctness, but costs more tokens and yields only **5/10 normally completed agent sessions**; five sessions exhaust the 15-step budget despite leaving code that passes all checks. The result supports further study of explicit rule boundaries. It does not establish deterministic reliability, a general ordering advantage, or an internal attention mechanism.
 
-## 2. Introduction
+## 2. Research Questions
 
-Open-weights 30B-class models such as Gemma 4 31B-IT execute multi-step coding workflows on a single workstation, often split into a *Designer* stage producing a specification and a *Coder* stage writing and testing code. Yet specifications range from free-form prose and static schemas to declarative invariants and numbered execution flows. Under bounded context windows (`12,288` tokens) and step budgets (`15` steps), local 31B models face a sharp trade-off: verbose guidelines trigger mid-run history compaction and truncated tool calls, whereas underspecified state-transition ordering causes multi-table SQLite bugs.
+Structured development workflows motivate separating a Designer from a Coder, as in work on SOP-based agent coordination ([MetaGPT](https://arxiv.org/abs/2308.00352)). Here we isolate the specification artifact within a small local harness. This is a code-generation study on two related benchmarks; its scores are not comparable to repository issue-resolution benchmarks such as [SWE-bench](https://arxiv.org/abs/2310.06770).
 
-We address two questions in a local harness without commercial framework retries:
-1. **Representation:** How do six progressively structured design representations affect verification accuracy and token cost across small- and large-scale transactional coding benchmarks?
-2. **Mechanism (Content vs. Order):** When a numbered execution-flow specification prevents a lifecycle bug that breaks declarative invariants, does the gain come from extra domain wording or from sequential `Step 1→Step N` ordering?
-
----
+We ask: (1) how do design representations change correctness and cost; (2) does preserving rule content while removing numbering and shuffling bullets change outcomes; and (3) does explicitly restricting a rule to its intended method reduce a recurring cancelled-booking replay error?
 
 ## 3. Methodology
 
-### 3.1 Experimental Harness and Model Configuration
+### 3.1 Harness, Tasks, and Outcomes
 
-All 22 runs used **Gemma 4 31B-IT** (`Q4_K_M` GGUF) on `llama.cpp` (single server slot) at `temperature=0.2` (standard low-temperature coding setting to prevent tool-call JSON syntax noise), `context_length=12,288` tokens (near ceiling, history compaction retains the initial prompt and 6 latest messages while summarizing older turns), and a `15`-step budget.
-- **Stage 1 (Designer):** Takes task requirements and condition instructions, generating a structured JSON specification and markdown overview in one turn without tools.
-- **Stage 2 (Coder):** Receives only task requirements and the Stage 1 artifact in a clean workspace with five jailed tools across three roles: (1) workspace inspection (listing directories and reading files), (2) code editing (writing full files and replacing text blocks), and (3) automated testing (running `pytest` and returning output traces).
+The original two-stage pipeline generates a JSON design in a single-turn Designer session, then gives the brief and design to a fresh Coder workspace. The Coder has five tools: `list_files`, `read_file`, `write_file`, `replace_text`, and `run_tests`. Fixed-design follow-ups inject a saved JSON artifact without a new Designer call. Prompts, metrics, generated code, and JSONL traces are preserved.
 
-### 3.2 Benchmark Architecture and Standard Verification Suites
+Reported settings are Gemma 4 31B-IT `Q4_K_M`, one `llama.cpp` slot, `temperature=0.2`, context `12,288`, and a 15-step budget. **Exceptions:** V1 no-design had a 40-step ceiling and finished in nine steps; per-turn output limits were `3,584` for V1 Cond 1–3 and 5, and `4,608` for V1 Flow and V2. V2 Flow r1 records a 300-second timeout; later follow-up configurations record 900 seconds. Seeds are unset. Metadata labels the endpoint `local-model` and does not contain an immutable model-file fingerprint.
 
-Both benchmarks require building a standalone Python 3.11+ SQLite transactional backend (supporting file paths and single-connection `:memory:` persistence) and unit tests for a 1:1 counseling service ("Yeobaek Counseling").
+V1 is a two-table, five-operation booking backend with six checks. V2 is a **seven-table, thirteen-operation backend** covering counselors, slots, prepaid passes, an idempotent ledger, bookings, a FIFO waitlist, and audit logs. Its eight checks cover slot lifecycle (REQ-1), pass issuance (REQ-2), booking creation (REQ-3), atomic rescheduling (REQ-4), cancellation without promotion (REQ-5), waitlist promotion (REQ-6), reconciliation (REQ-7), and cancelled-booking replay (REQ-8). REQ-8 requires a repeated idempotency key to return the existing cancelled booking without another pass deduction.
 
-#### Small-Scale Task (V1): 2 Tables, 5 Public Operations, 6 Requirements
-The small-scale benchmark models a reservation service over **2 relational tables** (counselor slots and bookings) and **5 public operations**: registering available slots, querying open slots by counselor and date filters, creating a booking, looking up a booking with client email authentication, and cancelling a booking. Six checks verify: `REQ-1` slot registration and filtered queries; `REQ-2` booking creation and availability exclusion; `REQ-3` blocking duplicate slots and double-bookings; `REQ-4` client email ownership verification on lookup; `REQ-5` authenticated cancellation restoring slot availability for re-booking; and `REQ-6` single-connection `:memory:` persistence.
+We distinguish **external artifact verification**, agent-written pytest results, and **harness completion**. A budget-exhausted session can leave a passing artifact. Eight checks do not establish correctness for all inputs or concurrency schedules. Means are reported with sample standard deviations. Total tokens sum Designer and Coder input/output usage across calls; they include repeated context, not just unique text. Coder-only tokens are also reported for the mixed follow-up cohort.
 
-#### Large-Scale Task (V2): 4 Subsystems, 7 Coupled Tables, 13 Public Operations, 8 Requirements
-The large-scale benchmark coordinates **7 coupled SQLite tables** (counselors, time slots, session passes, a pass transaction ledger, bookings, a priority waitlist, and chronological audit logs) across **4 domain subsystems** and **13 public operations**:
-1. **Subsystem A — Counselor & Slot Lifecycle:** Registering counselor profiles, adding `AVAILABLE` slots, blocking unbooked slots (`AVAILABLE→BLOCKED`, rejecting `BOOKED` slots), and querying available slots (**`REQ-1`**).
-2. **Subsystem B — Prepaid Session Pass & Idempotent Ledger:** Issuing or topping up multi-session passes backed by an append-only ledger (`ISSUE`, `USE`, `RESTORE` entries with signed deltas) that prevents duplicate credits on repeated idempotency keys, plus querying remaining and used balances (**`REQ-2`**).
-3. **Subsystem C — Booking & Atomic Rescheduling Saga:** Creating bookings (checking idempotency keys, verifying `AVAILABLE` slot and `remaining_sessions >= 1`, atomically setting slot `BOOKED`, deducting `-1` session with a `USE` ledger entry, inserting a `CONFIRMED` booking, and logging creation, with rollback on insufficient quota [`REQ-3`]), authenticated lookup, and atomic rescheduling (swapping old slot to `AVAILABLE` and new slot to `BOOKED` without changing pass balances, logging the reschedule event, and preserving the original booking on failure [`REQ-4`]).
-4. **Subsystem D — Waitlist Auto-Promotion, Audit & Reconciliation:** Enqueuing clients with `remaining_sessions >= 1` as FIFO `WAITING` on `BOOKED` slots, cancelling bookings (marking `CANCELLED`, refunding `+1` session via `RESTORE` ledger, and branching on the FIFO waitlist: if no eligible waiting client exists, resetting the slot to `AVAILABLE` [`REQ-5`]; if one exists, expiring zero-balance rows, promoting the first eligible client to a `CONFIRMED` booking, deducting `-1` session via `USE` ledger, and keeping the slot `BOOKED` [`REQ-6`]), querying audit logs, and computing global reconciliation verifying `total_issued_sessions == total_remaining_sessions + total_used_sessions` and `total_used_sessions == active_confirmed_bookings == booked_slots_count` (**`REQ-7`**).
-- **`REQ-8` (Cancelled-Booking Idempotency Replay):** After a booking created with a client-supplied `idempotency_key` is cancelled (`status='CANCELLED'`, slot reopened to `AVAILABLE`), calling booking creation again with that same `idempotency_key` must return the existing cancelled record without deducting another session or crashing on a `UNIQUE` constraint.
+### 3.2 Conditions and Cohort Accounting
 
-### 3.3 Experimental Conditions and Controlled Ablations
+The initial 22-run study includes no-design baselines (direct and minimal wrapper), prose, structural contracts, declarative invariants, numbered execution flow, shuffled flow, and flow with behavioral checklists. Tables 1–3 retain these original observations.
 
-|Condition|Mode|Specification Provided to Stage 2 (Coder)|
-|:---|:---:|:---|
-|**Cond 0-Pure (`Direct`)**|1-Stage|**Pure No-Design Baseline.** Stage 1 skipped (`0` design tokens); Coder receives raw requirements.|
-|**Cond 0-Min (`Unprimed`)**|2-Stage|**Minimal Wrapper Baseline.** Stage 1 runs with an unconstrained pass-through prompt.|
-|**Cond 1 (`Free-Form Prose`)**|2-Stage|**Free-Form Prose.** Unconstrained markdown architecture and component narrative.|
-|**Cond 2 (`Static Contracts`)**|2-Stage|**Structural Contracts.** Explicit SQLite schemas, operation signatures, types, and exceptions.|
-|**Cond 3 (`State Invariants`)**|2-Stage|**State Invariants.** Structural contracts plus declarative conservation equations and transitions.|
-|**Cond 4-Flow (`Execution Flow`)**|2-Stage|**Execution-Flow Specification.** Contracts plus numbered pipelines (`Step 1→Step N`) per operation.|
-|**Cond 4-Unordered (`Shuffled`)**|Fixed-S2|**Information-Controlled Ablation.** Frozen `Cond 4-Flow` (`r1`) JSON specification with `1..6` numbers stripped and bullets shuffled.|
-|**Cond 5 (`Profiled Flow`)**|2-Stage|**Profiled Specification.** Full specification plus developer behavioral rules and checklists.|
+The extension compares:
 
-*Note: V1 `Cond 0-Pure` ran under an initial 40-step ceiling and finished early in `9` steps; per-turn `max_output_tokens` was `3,584` for V1 `Cond 1`–`Cond 3` and `Cond 5`, and `4,608` for V1 `Cond 4-Flow` and all V2 runs.*
+- **Flow Base:** numbered flows; original r1–r3 plus seven new runs. The first three used separately generated designs. New r4–r10 freeze r1's design.
+- **Unordered:** r1's flow rule content and schemas, with step numbers removed and bullets shuffled; three original plus seven new runs. This preserves rule content, not identical token sequences, and changes numbering and position together.
+- **Flow + Scoped:** the frozen Flow design plus a Korean/English clarification attached to `create_booking` step 1 and repeated in a `scope_rule` field. It says to return an existing booking regardless of status and restricts the `CONFIRMED` eligibility check to rescheduling/cancellation. An earlier pilot r1 is included with nine subsequent runs.
 
----
+Thus **22 + 24 = 46 unique study runs**, not 52. The 30 follow-up observations overlap the initial study by six runs. Scoped changes instruction content, length, repetition, and language as well as scope. These are exploratory sequential cohorts, not a fully randomized, token-matched factorial experiment. No `Unordered + Scoped` condition has been run.
 
 ## 4. Results
 
-Each run was evaluated by **Agent Pytest** and our **Standard Verification Suite** (`REQ-1`–`REQ-6` on V1; `REQ-1`–`REQ-8` on V2; `Total Tokens=Design In + Design Out + Impl In + Impl Out`).
+### 4.1 Initial Sweep: Historical Results
 
-### 4.1 Small-Scale vs. Large-Scale Single-Run Sweep (`r1`)
-
-#### Table 1: Small-Scale Task (V1, 2 Tables, 5 Operations, 6 Requirements)
+#### Table 1: V1 (2 tables, 5 operations, 6 requirements)
 
 |Condition|Status|Design In|Design Out|Design Time|Steps (Tools)|Impl In|Impl Out|Total Tokens|Total Time|Agent Pytest|Standard Verify|
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -99,11 +71,11 @@ Each run was evaluated by **Agent Pytest** and our **Standard Verification Suite
 
 *§V2 `Cond 5` suffered repeated output truncations and compactions (`54,413` coder output tokens), hitting Step 15 before creating unit tests; its generated engine passes `7/8`.*
 
-### 4.2 Multi-Run Repetitions (`n=3`) and Information-Controlled Ablation (`Cond 4-Unordered`)
+### 4.2 Initial Repetitions: Historical n=3 Results
 
-We ran `n=3` repetitions (`r1`–`r3`) for four V2 groups: **Cond 0-Pure**, **Cond 3 Invariant**, **Cond 4-Flow**, and **Cond 4-Unordered** (feeding Stage 2 the exact `Cond 4-Flow` `r1` JSON specification with `1..6` step numbers stripped and bullets shuffled so booking creation's idempotency lookup moves from `Step 1` to the 5th bullet after slot validation, pass validation, and transaction writes).
+Table 3 describes the original subset; its two-of-three versus one-of-three result is not an independent replication of the expanded cohort.
 
-#### Table 3: Large-Scale Task Multi-Run Stability & Information-Controlled Ablation (`n=3` per Group)
+#### Table 3: Original V2 repetitions (mean ± sample SD)
 
 |Group (`n=3` on Large-Scale V2)|Per-Run Verify (`r1, r2, r3`)|Mean Verify|8/8 (`REQ-8`) Pass Rate|Impl Steps|Impl Out Tokens|Total Tokens|Total Time|
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -112,86 +84,74 @@ We ran `n=3` repetitions (`r1`–`r3`) for four V2 groups: **Cond 0-Pure**, **Co
 |**`Cond 4-Unordered` (Fixed Shuffled)**|`8/8, 7/8, 7/8`|`7.33±0.58`|`1/3 (33.3%)`|`9.33±4.16`|`22,653±10,584`|`88,325±42,688`|`34.4±16.2m`|
 |**`Cond 4-Flow` (`Step 1..N`)** ⭐|**`8/8, 7/8, 8/8`**|**`7.67±0.58`**|**`2/3 (66.7%)`**|**`8.67±1.15`**|**`16,560±418`**|**`83,878±3,302`**|**`30.9±3.0m`**|
 
-### 4.3 Code- and Trace-Level Root-Cause Analysis
+### 4.3 Expanded V2 Follow-Up (n=10 per condition)
 
-Inspecting generated SQL queries and step traces across all 22 runs reveals five mechanisms behind Tables 1–3.
+The external verifier was rerun against all 30 preserved implementations. Every per-run pass/fail pattern matched the original summaries. Static inspection of SQL strings inside `create_booking` independently reproduced the status-filter counts. This inspection handles multiline literals but is not a general SQL/data-flow analyzer.
 
-#### Mechanism 1: Branch-Omission Bug under Free-Form Prose (`Cond 1`, Failing `REQ-5` and `REQ-7`)
-In V2 `Cond 1`, prose design emphasized positive waitlist promotion on cancellation without enumerating branch postconditions. In the waitlist-processing routine invoked during cancellation, the Coder's `while waitlist_entry:` loop kept the slot `'BOOKED'` on promotion **but omitted the fallback query to reset `slots.status='AVAILABLE'` when no waitlisted client was promoted**:
-```python
-# Observed in Large-Scale V2 Cond 1 (waitlist processing during cancellation)
-waitlist_entry=self.conn.execute(
-    "SELECT * FROM waitlist WHERE counselor_id=? AND start_time=? AND status='WAITING' ORDER BY created_at ASC LIMIT 1",
-    (counselor_id, start_time)
-).fetchone()
-while waitlist_entry:
-    ...
-    if remaining >= 1:
-        ...
-        self.conn.execute("UPDATE slots SET status='BOOKED' WHERE counselor_id=? AND start_time=?", (counselor_id, start_time))
-        break
-    else:
-        self.conn.execute("UPDATE waitlist SET status='EXPIRED' WHERE waitlist_id=?", (waitlist_entry["waitlist_id"],))
-        waitlist_entry=...
-# BUG: Missing fallback `UPDATE slots SET status='AVAILABLE'` when no waitlisted client is promoted
+#### Table 4: Correctness, Lookup Predicates, and Harness Completion
+
+| Condition | n | Status-filter instances | REQ-8 pass | Full 8/8 pass | Mean score ± SD | Harness completed |
+| :--- | ---: | :---: | :---: | :---: | :---: | :---: |
+| Flow Base | 10 | 5/10 | 5/10 | 5/10 (50%) | 7.50 ± 0.53 | 8/10 |
+| Unordered | 10 | 6/10 | 4/10 | 4/10 (40%) | 7.40 ± 0.52 | 10/10 |
+| Flow + Scoped | 10 | 0/10 | 10/10 | 10/10 (100%) | 8.00 ± 0.00 | 5/10 |
+
+In this cohort, every status-filter instance coincides with a REQ-8 failure; all other checks pass. The scoped artifact pass rate is 50 percentage points above Flow Base. The nine subsequent scoped runs also pass 9/9 when the earlier pilot is excluded. Five scoped sessions (r2, r3, r4, r8, r10) nevertheless record `failed` after exhausting 15 steps. Artifact verification and session completion must not be conflated.
+
+#### Table 5: Recorded Follow-Up Cost (mean ± sample SD)
+
+| Condition | Coder steps | Coder tokens | Total tokens | Recorded time (min) |
+| :--- | :---: | :---: | :---: | :---: |
+| Flow Base | 9.40 ± 3.24 | 89,959 ± 38,921 | 92,001 ± 38,313 | 38.65 ± 16.09 |
+| Unordered | 7.80 ± 2.35 | 71,144 ± 24,517 | 71,144 ± 24,517 | 28.57 ± 10.31 |
+| Flow + Scoped | 11.40 ± 3.89 | 119,054 ± 48,610 | 119,054 ± 48,610 | 68.25 ± 35.67 |
+
+Flow Base includes Designer costs for its first three observations; the fixed-design conditions do not. Scoped uses about 29% more total tokens, or 32% more Coder tokens, than Flow Base. Timings come from sequential sessions and do not isolate prompt effects from workstation conditions. The initial Flow group's low token variance (Table 3) does not persist in the expanded cohort (Table 5).
+
+Ten successes do not imply a true success probability of one. Under an independent, identical Bernoulli-trial assumption, the two-sided 95% Clopper–Pearson interval for 10/10 is approximately **69.2%–100%** (exact interval convention documented by [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html)). Cohort reuse and pilot inclusion further limit a confirmatory interpretation. We make no claim of statistical proof of a general causal effect.
+
+## 5. Code and Trace Evidence
+
+### 5.1 Predicate Mixing in Idempotency Replay
+
+A recurring failing implementation uses:
+
+```sql
+SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'
 ```
-Cancelled slots with empty waitlists stayed `'BOOKED'`, failing `REQ-5` and `REQ-7`.
 
-#### Mechanism 2: Mid-Generation Self-Correction Bug under Declarative Invariants (`Cond 3`, `r2` & `r3`)
-In `Cond 3 Invariant`, Stage 1 supplies declarative conservation laws rather than procedural steps. While `r1` passed `7/8` (`67,569` tokens), `r2` and `r3` fell to `1/8` (`146,112` and `154,716` tokens, 15 steps). In both runs, the Coder wrote `INSERT OR REPLACE` inside pass issuance during a full-file write, realized mid-generation that `REPLACE` overwrites existing balances on top-ups, and appended a corrective comment and an `UPDATE` query below it—since an autoregressive model cannot retract SQL statements already emitted in the same tool call:
-```python
-# Observed in Large-Scale V2 Cond 3 (r2 and r3 session-pass issuance)
-self.conn.execute("INSERT OR REPLACE INTO session_passes (client_email, remaining_sessions, used_sessions) VALUES (?, ?, ?)", 
-                 (client_email, sessions_to_add, 0))
-# Note: INSERT OR REPLACE is simplified; should be UPDATE if exists.
-# Correcting to:
-self.conn.execute("UPDATE session_passes SET remaining_sessions=remaining_sessions + ? WHERE client_email=?", (sessions_to_add, client_email))
+A cancelled record cannot satisfy this predicate. Replay then continues into creation logic instead of returning the existing booking. Passing implementations use an idempotency-key lookup without that status restriction. The scoped prompt states this boundary explicitly. The observed pattern is consistent with confusion between replay lookup and mutation eligibility; it does not directly measure attention or establish that adjacent-method interference is the sole cause.
+
+### 5.2 Other Failure Patterns in the Initial Study
+
+- **Prose (V2):** cancellation omits the fallback that reopens a slot when no eligible waitlisted client is promoted, failing REQ-5 and REQ-7.
+- **Invariants (r2/r3):** pass issuance emits `INSERT OR REPLACE` followed by an additive `UPDATE`, double-counting the initial balance. The code shows an appended correction rather than replacement of the original statement; this observation does not establish a general limitation of invariant specifications.
+- **Profiled flow (V2):** traces show repeated truncated write payloads and history compaction, ending at the step budget without agent tests. The remaining engine passes 7/8 external checks.
+
+These examples motivate method-level guards, explicit branch postconditions, and evaluation of final artifacts independently of the agent's own tests. They are case evidence rather than direct measurements of model cognition.
+
+## 6. Interpretation, Limitations, and Next Experiment
+
+The initial study suggested execution ordering might improve reliability. The extension narrows that claim: **ordering alone yields 5/10 versus 4/10 full passes**, while the scoped intervention yields 10/10 artifact passes with higher cost and lower session completion. We therefore describe order and scope jointly rather than claim that ordering matters more than rules.
+
+A practical candidate template is: (1) unconditional replay lookup; (2) method-specific eligibility and quota guards; (3) atomic mutations; (4) explicit branch fallback; (5) logging and return. The distinction between existing-record lookup and eligibility for a new mutation should be stated directly. This is a hypothesis supported on this task, not a universal prescription.
+
+Limits include two related single-module tasks, one reported quantized model, unset seeds, sequential cohorts, mixed design generation in Flow r1–r3, changed timeout settings, an included successful scoped pilot, and an intervention developed after observing the failure. The scoped text adds explicit cancelled-replay semantics twice and in two languages, so its result cannot isolate scope labels from semantic emphasis or repetition. No activation analysis, broad task distribution, or independent model replication was performed.
+
+The next experiment should complete **order × scope** with `Unordered + Scoped`, freeze a single base design, match semantic content and language across scoped variants, predefine all sample inclusion and outcomes, and counterbalance run order. Scope wording, repetition, and language should then be ablated separately. Higher-temperature sampling and multi-file tasks remain future work.
+
+## 7. Reproducibility
+
+The [GitHub repository](https://github.com/Eunryong/FlowSpec-Gemma4) preserves the original 22 study runs and 24 additional runs. The follow-up manifest lists all 30 observations and overlap explicitly. A CPU-only audit reruns REQ-1–REQ-8, checks recorded results and token totals, extracts lookup SQL, and records design/code hashes:
+
+```bash
+python3 scripts/audit_scope_followup.py
 ```
-Issuing 3 sessions inserts `remaining_sessions=3` and immediately adds `+3` (`remaining_sessions=6`), failing `REQ-2`–`REQ-8`. (The same inability to retract emitted lines caused V1 `Cond 5`'s crash, where the constructor emitted two differently named initialization calls back-to-back while defining only the second method.) Conversely, `Cond 4-Flow` pre-plans pass issuance as `Step 1 (check ledger idempotency)→Step 2 (validate)→Step 3 (atomic upsert)`, passing `REQ-1`–`REQ-7` in 100% of runs.
 
-#### Mechanism 3: Premature Predicate Conjoining on Cancelled Idempotency Replay (`REQ-8`)
-Across all 9 V2 runs failing `REQ-8` without an execution-flow specification—all 3 `Cond 0-Pure` runs, `Cond 0-Min`, `Cond 2`, all 3 `Cond 3` runs, and `Cond 5`—the Coder emitted the identical flawed query at the entry of booking creation:
-```python
-# Identical bug observed across all 9 failing non-flow runs on Large-Scale V2
-existing=self.conn.execute(
-    "SELECT * FROM bookings WHERE idempotency_key=? AND status='CONFIRMED'",
-    (idempotency_key,),
-).fetchone()
-```
-Conjoining `AND status='CONFIRMED'` misses `'CANCELLED'` rows on replay, either double-deducting a pass (`Cond 0-Pure`, `Cond 0-Min`, `Cond 3`, `Cond 5`) or crashing on `UNIQUE(idempotency_key)` (`Cond 2`).
-
-#### Mechanism 4: Proof via Information-Controlled Ablation (`Cond 4-Flow` vs. `Cond 4-Unordered`)
-In `Cond 4-Flow`, `r1` and `r3` passed `8/8` (`REQ-8` passed) because Stage 1 placed the unconditional idempotency check at `Step 1` of booking creation (`"1. If idempotency_key exists in bookings, return existing booking."`) ahead of `Step 2` (`"2. Verify slot exists and status == 'AVAILABLE'."`), leading Stage 2 to query `WHERE idempotency_key=?` without a status filter:
-```python
-# Observed in Large-Scale V2 Cond 4-Flow (r1 and r3 booking creation entry guard)
-if idempotency_key:
-    existing=self.conn.execute("SELECT * FROM bookings WHERE idempotency_key=?", (idempotency_key,)).fetchone()
-    if existing: return dict(existing)
-```
-To test whether `Cond 4-Flow` `r1` passed `REQ-8` due to the wording of its rule rather than its `Step 1` position, `Cond 4-Unordered` (`n=3`) kept the `r1` JSON text 100% identical—preserving `"If idempotency_key exists in bookings, return existing booking."`—while stripping `1..6` step numbers and moving that bullet from `Step 1` to the 5th (final) bullet after slot validation, pass validation, and transaction writes:
-- In **2 of 3 `Cond 4-Unordered` runs (`r2` and `r3`)**, despite receiving the identical unconditional rule `"If idempotency_key exists in bookings, return existing booking."`, the Coder conjoined `WHERE idempotency_key=? AND status='CONFIRMED'`, failing `REQ-8` (`1/3` pass rate vs. `2/3` in `Cond 4-Flow`).
-- Stripping step numbers also destabilized execution: `Cond 4-Unordered` `r3` took `14` steps and `136,352` tokens (`34,778` coder output tokens), inflating group total token standard deviation 12.9-fold (`± 42,688` vs. `± 3,302` in `Cond 4-Flow`). Because an autoregressive Coder writes a method body top-to-bottom, anchoring the guard at `Step 1` aligns the rule with the token position where the entry guard is generated.
-
-#### Mechanism 5: Output Truncation and Compaction Loops under Over-Profiled Prompts (`Cond 5`)
-In V2 `Cond 5`, behavioral rules and checklists stimulated Gemma 4's thinking mode prior to tool calls, pushing Stage 2 into a truncation-and-compaction loop (`15` steps, `54,413` coder output tokens, `156,890` total tokens). In 7 of 15 steps, full-file write calls hit token limits—`max_output_tokens=4,608` in Steps 2, 5, 6, 7, 10, and 12, and the `12,288` context ceiling in Step 15 (`9,610` in + `2,678` out)—failing with unterminated JSON string errors. These failed payloads triggered history compaction three times (after Steps 5, 10, and 12), erasing prior file-write turns and causing the Coder to overwrite the backend file five times (Steps 3, 4, 9, 11, and 13) without running tests.
-
----
-
-## 5. Discussion and Conclusion
-
-### 5.1 Engineering Guidelines for Local Gemma 4 Coding Agents
-1. **Drop unstructured prose design (`Cond 1`),** which adds 59%–219% more tokens than `Cond 0-Pure` and causes branch-omission bugs.
-2. **Replace declarative invariants (`Cond 3`) with numbered execution flows (`Cond 4-Flow`),** avoiding mid-generation SQL self-correction bugs (`3.00±3.46 / 8→7.67±0.58 / 8`) and cutting coder output token variance to `CV=2.5%` (`16,560±418` tokens).
-3. **Structure stateful operations as a 5-step template anchored by `Step 1` entry guards:** `[Step 1: Unconditional Entry/Idempotency Lookup]→[Step 2: Cross-Table State & Quota Guards]→[Step 3: Atomic Multi-Table Mutation]→[Step 4: Explicit If/Else Branching & Fallback]→[Step 5: Audit Logging & Return]`. As `Cond 4-Unordered` shows, identical unconditional lookup rules fail in `2/3` runs when displaced from `Step 1`.
-4. **Keep design outputs compact (`~1,500`–`2,500` tokens) without meta-behavioral checklists under `12k` context windows** to avoid `4,608`-token output truncations and compaction loops (`Cond 5`, `156,890` tokens).
-
-### 5.2 Limitations and Reproducibility
-Our study covers single-module SQLite backends (`n=3` per core group, 15-step budget) on local quantized hardware at `temperature=0.2`; evaluating higher temperatures (`0.6`–`0.8`) under `pass@k` sampling and multi-file repositories remains future work. All 22 run artifacts, prompts, JSON specifications, generated engines, JSONL traces, and verification suites are publicly preserved for deterministic reproduction.
+See `research/inputs/scope_followup_cohort.json`, the two original n=10 summary JSON files, `research/outputs/scope_followup_audit.json`, and `docs/scope_followup_results.md` for per-run provenance. Rechecking a preserved implementation is repeatable; generating the same implementation again is not guaranteed. No new model-generation runs were performed for this revision.
 
 ### References
-1. Gemma Team, Google DeepMind. *Gemma 4 Technical Report.* arXiv:2607.02770 (2026); and *Gemma: Open Models Based on Gemini Research and Technology.* arXiv:2403.08295 (2024).
-2. Markowitz, E., Perozzi, B., Rózemberczki, B., Cameron, G., Hemmati, H., Li, Y., Galkin, M., Farhadi, M., Holbrook, R., & Oldacre, A. *Google - The Gemma 4 Developer Agent Paper Track.* Kaggle (2026).
-3. Hong, S., et al. *MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework.* ICLR (2024).
-4. Pei, K., et al. *Can Large Language Models Reason about Program Invariants?* ICML (2023).
-5. Olausson, T. X., et al. *Is Self-Repair a Silver Bullet for Code Generation?* ICLR (2024).
-6. Jimenez, C. E., et al. *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* ICLR (2024).
+
+1. Hong et al. [MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework](https://arxiv.org/abs/2308.00352).
+2. Jimenez et al. [SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770).
+3. SciPy. [Exact binomial proportion confidence intervals](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html).

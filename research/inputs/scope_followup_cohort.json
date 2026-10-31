@@ -1,0 +1,73 @@
+{
+  "initial_study_run_ids": [
+    "20261012T111933Z_track2_no_design_r001_d53d733a",
+    "20261013T115013Z_track2_cond1_generic_r001_c96880ae",
+    "20261013T122410Z_track2_cond2_contract_r001_38979f94",
+    "20261013T125431Z_track2_cond3_invariant_r001_61262488",
+    "20261014T164845Z_track2_cond4_flow_r001_3468b58f",
+    "20261013T133544Z_track2_cond4_profiled_r001_c96ed0f4",
+    "20261015T014153Z_track2_no_design_r001_2d1a8d40",
+    "20261015T022428Z_track2_no_design_r001_0b5d1a63",
+    "20261015T053437Z_track2_no_design_r001_6d5dc1da",
+    "20261014T120559Z_track2_no_design_r001_ef7cf9fa",
+    "20261014T123515Z_track2_cond1_generic_r001_50ab54a7",
+    "20261014T132638Z_track2_cond2_contract_r001_8aa82474",
+    "20261014T142644Z_track2_cond3_invariant_r001_41f6db1b",
+    "20261015T025111Z_track2_cond3_invariant_r001_a09787a5",
+    "20261015T065024Z_track2_cond3_invariant_r001_165c852f",
+    "20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+    "20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+    "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+    "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+    "20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+    "20261015T092254Z_track2_cond4_unordered_r001_574b9eb5",
+    "20261014T152831Z_track2_cond5_profiled_r001_1fbf66c8"
+  ],
+  "followup_groups": {
+    "cond4_flow": [
+      "20261014T145844Z_track2_cond4_flow_r001_a90209d0",
+      "20261015T033705Z_track2_cond4_flow_r001_c9f9986f",
+      "20261015T075232Z_track2_cond4_flow_r001_e5655784",
+      "20261029T101223Z_track2_cond4_flow_r004_5fd493f7",
+      "20261029T122750Z_track2_cond4_flow_r005_4a58377d",
+      "20261029T134018Z_track2_cond4_flow_r006_4d393c1d",
+      "20261029T142541Z_track2_cond4_flow_r007_2f080d03",
+      "20261029T152711Z_track2_cond4_flow_r008_bd603a95",
+      "20261029T164621Z_track2_cond4_flow_r009_2b4bbbdd",
+      "20261029T172442Z_track2_cond4_flow_r010_8d5e4de9"
+    ],
+    "cond4_unordered": [
+      "20261015T020114Z_track2_cond4_unordered_r001_f61b6f80",
+      "20261015T040724Z_track2_cond4_unordered_r001_739903ea",
+      "20261015T092254Z_track2_cond4_unordered_r001_574b9eb5",
+      "20261029T105642Z_track2_cond4_unordered_r004_be184ca4",
+      "20261029T131553Z_track2_cond4_unordered_r005_7f0d7f01",
+      "20261029T135951Z_track2_cond4_unordered_r006_0581c346",
+      "20261029T150113Z_track2_cond4_unordered_r007_56ddd9bd",
+      "20261029T162409Z_track2_cond4_unordered_r008_5c4b8dd1",
+      "20261029T170612Z_track2_cond4_unordered_r009_a3888de2",
+      "20261029T183411Z_track2_cond4_unordered_r010_2b3cc446"
+    ],
+    "cond4_flow_scoped": [
+      "20261029T225731Z_track2_cond4_flow_scoped_r001_e11217cb",
+      "20261030T003851Z_track2_cond4_flow_scoped_r002_fceb113d",
+      "20261030T020805Z_track2_cond4_flow_scoped_r003_7d83e144",
+      "20261030T033713Z_track2_cond4_flow_scoped_r004_b91374e5",
+      "20261030T050721Z_track2_cond4_flow_scoped_r005_f3826222",
+      "20261030T054851Z_track2_cond4_flow_scoped_r006_2ff7e287",
+      "20261030T062622Z_track2_cond4_flow_scoped_r007_8a5f2167",
+      "20261030T070701Z_track2_cond4_flow_scoped_r008_4460c477",
+      "20261030T101226Z_track2_cond4_flow_scoped_r009_3aecc0f0",
+      "20261030T112121Z_track2_cond4_flow_scoped_r010_1c552853"
+    ]
+  },
+  "source_summaries": [
+    "research/outputs/flow_vs_unordered_full_10reps_summary.json",
+    "research/outputs/flow_scoped_10reps_summary.json"
+  ],
+  "notes": [
+    "Flow and Unordered reuse r1-r3 from the initial study.",
+    "Flow r2 and r3 used separately generated designs; r4-r10 froze r1.",
+    "Scoped r1 is an earlier pilot; r2-r10 are subsequent runs."
+  ]
+}

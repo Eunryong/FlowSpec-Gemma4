@@ -1,31 +1,36 @@
-# FlowSpec-Gemma4: Ordering Matters More Than Rules
+# FlowSpec-Gemma4: Execution Order and Method Scope
 
-> **Execution-Flow Specifications for Multi-Table Transactional Coding with Gemma 4 31B**  
-> *Design Representations, Information-Controlled Ablations, and Multi-Run Stability in a Local Agent Harness*
+> **Transactional code generation with a local Gemma 4 coding agent**
+> 46 unique study runs; 30 follow-up observations across three conditions.
 
-![FlowSpec-Gemma4 Overview](docs/flowspec_gemma4_thumbnail.png)
+![V2 follow-up artifact verification and session completion](docs/flowspec_gemma4_thumbnail.png)
 
-- 📄 **Full Paper (English — Kaggle Submission):** [`docs/kaggle_gemma4_paper_en.md`](docs/kaggle_gemma4_paper_en.md)
-- 📄 **Full Paper (Korean):** [`docs/kaggle_gemma4_paper_ko.md`](docs/kaggle_gemma4_paper_ko.md)
-- 📊 **Aggregated Telemetry & Multi-Run Summary (`n = 3`):** [`research/outputs/ablation_and_repetitions_summary.json`](research/outputs/ablation_and_repetitions_summary.json)
-- 🗂️ **All 22 End-to-End Run Artifacts & Traces:** [`research/runs/`](research/runs/)
+- [English paper — revised Kaggle submission](docs/kaggle_gemma4_paper_en.md)
+- [Korean paper](docs/kaggle_gemma4_paper_ko.md)
+- [Per-run follow-up evidence and cohort notes](docs/scope_followup_results.md)
+- [Recomputed follow-up audit](research/outputs/scope_followup_audit.json)
+- [Original n=3 summary](research/outputs/ablation_and_repetitions_summary.json)
+- [Kaggle writeup](https://www.kaggle.com/competitions/gemma-4-developer-agent-paper/writeups/new-writeup-1792105362437)
 
----
+## 1. Latest Findings: Correct Artifacts and Completed Sessions
 
-## 1. Overview & Key Findings
+We evaluate design specifications for Python/SQLite reservation backends using a local two-stage Designer/Coder harness. The reported model is **Gemma 4 31B-IT (`Q4_K_M`, llama.cpp)** at `temperature=0.2`, with a `12,288`-token context. V1 has 2 tables, 5 operations, and 6 requirements; V2 has **7 tables, 13 operations, and 8 requirements**. V2 uses a 15-step budget.
 
-This repository contains the local two-stage evaluation harness, benchmark briefs, condition prompts, verification suites, and all **22 end-to-end execution artifacts** for our study on how upfront software design specifications affect a locally hosted **Gemma 4 31B-IT** (`Q4_K_M` GGUF on `llama.cpp`, `temperature = 0.2`, `12,288`-token context, `15`-step tool budget).
+The initial study covered 22 runs. A follow-up added 24 runs and reused six initial observations: **30 follow-up observations, 46 unique study runs overall**. Re-running the external verifier on all 30 artifacts reproduced these results:
 
-Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tables, 5 methods, 6 requirements)** and **Large-Scale Task (V2: 4 subsystems, 7 coupled SQLite tables, 13 methods, 8 requirements)**—we evaluate six design representations, a pure no-design baseline (`Cond 0-Pure`), an information-controlled unordered ablation (`Cond 4-Unordered`), and `n = 3` repetitions on core large-scale conditions:
+| V2 condition | n | Full 8/8 pass | REQ-8 pass | Status filter in replay lookup | Harness completed |
+| :--- | ---: | :---: | :---: | :---: | :---: |
+| Flow Base: numbered steps | 10 | 5/10 (50%) | 5/10 | 5/10 | 8/10 |
+| Unordered: unnumbered shuffled rules | 10 | 4/10 (40%) | 4/10 | 6/10 | 10/10 |
+| Flow + Scoped: explicit method boundary | 10 | 10/10 (100%) | 10/10 | 0/10 | 5/10 |
 
-1. **Free-form prose design (`Cond 1`) underperforms no design (`Cond 0-Pure`) at both scales**, exhausting the 15-step budget, inflating total token cost by 59%–219%, and introducing a branch-omission bug (`6/8` on V2 vs. `7/8` without design).
-2. **Declarative state invariants (`Cond 3`) are brittle across repetitions (`n = 3`)**, passing `7/8` in `r1` (`67,569` tokens) but collapsing to `1/8` in `r2` and `r3` (`146,112` and `154,716` tokens) due to an SQLite mid-generation self-correction double-counting bug (`3.00 ± 3.46 / 8`).
-3. **Numbered execution-flow specifications (`Cond 4-Flow`, `Step 1 → Step N`) maximize both accuracy and stability**, achieving the lowest cost on V1 (`33,219` tokens, `7` steps, `6/6`) and the highest verification accuracy on V2 (`7.67 ± 0.58 / 8`, passing `8/8` in `2/3` runs) with **`83,878 ± 3,302` total tokens (`CV = 3.9%`)** and **`16,560 ± 418` coder output tokens (`CV = 2.5%`)**.
-4. **Information-content control (`Cond 4-Unordered` vs. `Cond 4-Flow`) proves that step ordering—not wording—prevents lifecycle bugs:** providing the exact same JSON text, schemas, and unconditional lookup rule (`"If idempotency_key exists in bookings, return existing booking."`) with step numbers stripped and bullets shuffled cuts the `8/8` pass rate from `2/3` (`66.7%`) to `1/3` (`33.3%`) and inflates total token standard deviation 12.9-fold (`± 42,688` vs. `± 3,302`).
+**Main observation:** stating that `create_booking` must return an existing booking regardless of status coincides with removal of a recurring `status='CONFIRMED'` filter from its idempotency lookup. That filter incorrectly excludes cancelled bookings. Scope text reserves the `CONFIRMED` eligibility check for rescheduling/cancellation.
 
----
+**Cost and completion:** Scoped averages 119,054 total tokens versus 92,001 for Flow Base (about +29%). Five scoped sessions exhaust the 15-step budget while leaving code that passes 8/8. Artifact correctness therefore differs from agent-session completion. See paper Tables 4–5 for Coder-only costs and sample standard deviations.
 
-## 2. Summary of Experimental Results (Tables 1–3)
+**Interpretation:** these data support explicit method boundaries as a candidate intervention on this task. They do not prove deterministic reliability or a general ordering advantage. Flow r1–r3 use separately generated designs; r4–r10 freeze r1. Scoped includes an earlier successful pilot and adds bilingual repeated semantic guidance. `Unordered + Scoped` remains future work. The [paper](docs/kaggle_gemma4_paper_en.md) documents configuration differences, sampling limits, and uncertainty.
+
+## 2. Initial 22-Run Study (Historical Tables 1–3)
 
 ### Table 1: Small-Scale Task (V1 — 2 Tables, 5 Public Methods, 6 Requirements)
 
@@ -65,11 +70,11 @@ Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tab
 
 ---
 
-## 3. Repository Structure & Artifact Index (All 22 Runs)
+## 3. Repository Structure & Study Artifact Index
 
 ### Core Directories
 
-- [`docs/kaggle_gemma4_paper_en.md`](docs/kaggle_gemma4_paper_en.md) — English submission paper (`2,908` words).
+- [`docs/kaggle_gemma4_paper_en.md`](docs/kaggle_gemma4_paper_en.md) — Revised English submission paper, including the 30-observation follow-up.
 - [`docs/kaggle_gemma4_paper_ko.md`](docs/kaggle_gemma4_paper_ko.md) — 1:1 Korean translation of the submission paper.
 - [`research/briefs/`](research/briefs/) — Benchmark task requirements:
   - [`brief_v1.md`](research/briefs/brief_v1.md): Small-Scale Task (V1 — 2 tables, 5 public methods, `REQ-1`–`REQ-6`).
@@ -81,9 +86,11 @@ Across two 1:1 counseling reservation benchmarks—**Small-Scale Task (V1: 2 tab
 - [`scripts/run_ablation_and_repetitions.py`](scripts/run_ablation_and_repetitions.py) — Automation and aggregation script for `Cond 0-Pure`, `Cond 4-Unordered`, and `n = 3` repetitions.
 - [`src/gemma_agent/`](src/gemma_agent/) — Core two-stage local agent harness and five workspace-jailed tools (`list_files`, `read_file`, `write_file`, `replace_text`, `run_tests`).
 
-### Artifact Index: Mapping Paper Tables 1–3 to `research/runs/<run_id>`
+### Initial Study Index: Mapping Tables 1–3 to 22 Runs
 
-Each directory under [`research/runs/`](research/runs/) contains `metadata.json`, `design/design_spec.json` and `design/.agent/trace.jsonl` (when Stage 1 is enabled), `implementation/counseling_engine.py`, `implementation/.agent/trace.jsonl`, and `metrics/` (`design.json`, `implementation.json`, `total.json`).
+Study run directories under [`research/runs/`](research/runs/) preserve `metadata.json`, `design/design_spec.json` and `design/.agent/trace.jsonl` (when Stage 1 is enabled), `implementation/counseling_engine.py`, `implementation/.agent/trace.jsonl`, and `metrics/` (`implementation.json`, `total.json`, and `design.json` when Stage 1 ran). Fixed-design observations skip Designer calls; stage failures are preserved rather than excluded.
+
+The [follow-up appendix](docs/scope_followup_results.md) maps all 30 follow-up observations to artifacts and the [cohort manifest](research/inputs/scope_followup_cohort.json) records six reused observations. There are **46 unique study runs**; the repository also contains other harness experiments outside this study.
 
 #### Small-Scale Task (V1 — Table 1, 6 Runs)
 
@@ -131,21 +138,15 @@ source .venv/bin/activate
 pip install -e . pytest
 ```
 
-### Step 2: Verify Existing 22 Runs & Launch Interactive Inspection Dashboard (No GPU Required)
-
-You can immediately run the deterministic **Standard Verification Suite** (`REQ-1`–`REQ-6` on V1 and `REQ-1`–`REQ-8` on V2) against the preserved agent implementations and inspect each generated backend via the live multi-port web dashboard:
+### Step 2: Recheck the 30 Follow-Up Implementations (No Model or GPU Required)
 
 ```bash
-python3 scripts/inspect_servers.py
+python3 scripts/audit_scope_followup.py
 ```
 
-- Opens the **Master Comparison Hub** at `http://127.0.0.1:8100` (and live per-condition web apps on ports `8110`–`8115` for Small V1 and `8120`–`8125` for Large V2).
+This reruns REQ-1–REQ-8 on all 30 preserved implementations, compares the results and token totals to original summaries, inspects idempotency lookup SQL, and writes [`scope_followup_audit.json`](research/outputs/scope_followup_audit.json). It does not generate new model outputs or change the original run artifacts.
 
-To recompute the multi-run (`n = 3`) and information-controlled ablation statistics in [`research/outputs/ablation_and_repetitions_summary.json`](research/outputs/ablation_and_repetitions_summary.json):
-
-```bash
-python3 scripts/run_ablation_and_repetitions.py
-```
+For interactive inspection of the initial sweep, run `python3 scripts/inspect_servers.py` and visit `http://127.0.0.1:8100`. That dashboard shows its configured initial runs; it is not the 30-run follow-up audit. The older `scripts/run_ablation_and_repetitions.py` can launch model experiments and is not a read-only audit command.
 
 ### Step 3: Run New End-to-End Experiments with Local `llama.cpp`
 
